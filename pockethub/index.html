@@ -1,0 +1,1764 @@
+<!doctype html>
+<html lang="de" data-theme="system">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0d12">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<title>PocketHub</title>
+<style>
+:root{--bg:#0b0d12;--card:#14171e;--card2:#1c2029;--border:#252a35;--border2:#3a4150;--text:#eef0f4;--muted:#8b93a3;--accent:#6d6af8;--accent-t:#fff;--ok:#22c55e;--danger:#ef4444;--warn:#f59e0b;--shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35);color-scheme:dark}
+:root[data-theme=light]{color-scheme:light;--bg:#f5f6f8;--card:#fff;--card2:#f0f2f5;--border:#e5e7eb;--border2:#cbd0d8;--text:#0f1219;--muted:#6b7280;--accent:#4f46e5;--shadow:0 1px 2px rgba(16,24,40,.05),0 10px 30px rgba(16,24,40,.08)}
+@media (prefers-color-scheme: light){:root[data-theme=system]{color-scheme:light;--bg:#f5f6f8;--card:#fff;--card2:#f0f2f5;--border:#e5e7eb;--border2:#cbd0d8;--text:#0f1219;--muted:#6b7280;--accent:#4f46e5;--shadow:0 1px 2px rgba(16,24,40,.05),0 10px 30px rgba(16,24,40,.08)}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}
+body{min-height:100vh;overscroll-behavior-y:contain}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;padding:0}
+input,select,textarea{font:inherit;color:var(--text);background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;width:100%;outline:none;transition:border-color .15s,box-shadow .15s}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 20%,transparent)}
+input.invalid,textarea.invalid{border-color:var(--danger);animation:shake .3s}
+textarea{resize:vertical}
+.ic{display:block;flex:none}
+.num{font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}
+.mono{font-family:ui-monospace,"Roboto Mono",Consolas,monospace}
+/* Top bar */
+.bar{position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:4px;padding:calc(8px + env(safe-area-inset-top)) 8px 8px;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
+.bar h1{flex:1;font-size:17px;font-weight:600;margin:0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.01em}
+.bar-actions{display:flex;gap:2px;align-items:center}
+.icon-btn{width:40px;height:40px;border-radius:12px;display:inline-grid;place-items:center;flex:none;color:var(--text);transition:background .15s}
+.icon-btn:hover,.icon-btn:active{background:var(--card2)}
+.icon-btn.sm{width:34px;height:34px;border-radius:10px;color:var(--muted)}
+.icon-btn.danger{color:var(--danger)}
+.content{padding:16px 16px 112px;max-width:720px;margin:0 auto}
+.fab{position:fixed;right:20px;bottom:calc(22px + env(safe-area-inset-bottom));width:56px;height:56px;border-radius:18px;background:var(--accent);color:var(--accent-t);display:grid;place-items:center;box-shadow:0 10px 28px color-mix(in srgb,var(--accent) 45%,transparent);z-index:20;transition:transform .1s}
+.fab:active{transform:scale(.94)}
+/* Basics */
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:12px}
+.card h3{margin:0 0 12px;font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px}
+.card h3 .ic{color:var(--muted)}
+.info{display:flex;gap:12px;align-items:center;font-size:13.5px;color:var(--muted);background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px 14px;margin-bottom:12px}
+.info>.ic{color:var(--accent)}
+.info span{flex:1}
+.row{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px 14px;margin-bottom:8px}
+.row.bl{border-left:3px solid var(--c)}
+.row-main{flex:1;min-width:0;cursor:pointer}
+.row-title{font-weight:500;overflow-wrap:anywhere}
+.row-sub{color:var(--muted);font-size:12.5px;margin-top:2px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.row.done .row-title{text-decoration:line-through;color:var(--muted)}
+.check{width:22px;height:22px;border-radius:7px;border:2px solid var(--border2);flex:none;display:grid;place-items:center;transition:.15s;color:#fff}
+.check .ic{opacity:0;transform:scale(.6);transition:.15s}
+.check.on{background:var(--accent);border-color:var(--accent)}
+.check.on .ic{opacity:1;transform:none}
+.sec{font-size:11.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin:22px 2px 10px;font-weight:600;display:flex;align-items:center;gap:6px}
+.sec:first-child{margin-top:2px}
+.sec.warn{color:var(--warn)}
+.empty{text-align:center;color:var(--muted);padding:56px 20px;font-size:14px}
+.empty-ic{width:60px;height:60px;border-radius:18px;background:var(--card2);display:grid;place-items:center;margin:0 auto 14px;color:var(--muted)}
+.empty p{margin:0}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 16px;border-radius:12px;background:var(--card2);border:1px solid var(--border);font-weight:600;font-size:14px;white-space:nowrap;transition:filter .15s}
+.btn:active{filter:brightness(.92)}
+.btn.primary{background:var(--accent);color:var(--accent-t);border-color:transparent}
+.btn.danger{background:var(--danger);color:#fff;border-color:transparent}
+.btn.danger-o{color:var(--danger)}
+.btn.ghost{background:transparent;border-color:transparent}
+.btn.sm{padding:7px 12px;font-size:13px;border-radius:10px}
+.btn.block{width:100%;margin-top:8px}
+.btn.big{flex:1;padding:15px;font-size:16px;border-radius:14px}
+.btn-row{display:flex;gap:10px;margin:16px 0}
+.hint{color:var(--muted);font-size:12.5px;margin:10px 2px;line-height:1.5}
+.warn{color:var(--warn)}
+.neg{color:var(--danger)} .pos{color:var(--ok)}
+.badge{display:inline-flex;font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--card2);color:var(--muted)}
+.badge.high{background:color-mix(in srgb,var(--danger) 16%,transparent);color:var(--danger)}
+.badge.low{background:color-mix(in srgb,var(--ok) 16%,transparent);color:var(--ok)}
+.meta{display:inline-flex;align-items:center;gap:4px}
+.search{position:relative;margin-bottom:14px}
+.search .ic{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
+.search input{padding-left:40px}
+.seg{display:flex;background:var(--card2);border-radius:12px;padding:3px;gap:3px;flex-wrap:wrap}
+.seg button{flex:1;padding:8px 10px;border-radius:9px;font-weight:600;font-size:13px;color:var(--muted);min-width:fit-content;transition:.15s}
+.seg button.on{background:var(--card);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.18)}
+.seg.big{margin-bottom:16px}
+.addbar{display:flex;gap:8px;margin-bottom:14px}
+.addbar input{flex:1}
+.addbar .btn{padding:0 14px}
+.ichip{display:grid;place-items:center;border-radius:12px;background:color-mix(in srgb,var(--c) 15%,transparent);color:var(--c);flex:none}
+.progress{height:6px;background:var(--card2);border-radius:99px;overflow:hidden;margin-top:10px}
+.progress i{display:block;height:100%;background:var(--accent);border-radius:99px;transition:width .3s}
+/* Home */
+.home{padding:calc(22px + env(safe-area-inset-top)) 16px 32px;max-width:720px;margin:0 auto}
+.home-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:18px}
+.home-date{color:var(--muted);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.home-greet{font-size:26px;font-weight:700;letter-spacing:-.02em;margin-top:4px}
+.home-btns{display:flex;gap:4px}
+.home-btns .icon-btn{background:var(--card);border:1px solid var(--border)}
+.overview{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ov{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px;text-align:left;min-width:0;display:flex;flex-direction:column;gap:10px}
+.ov-top{display:flex;align-items:center;justify-content:space-between;color:var(--muted);font-size:12.5px;font-weight:500}
+.ov-v{font-size:22px;font-weight:700;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ov-v.sm{font-size:14px;font-weight:600;letter-spacing:0}
+.ov-v small{display:block;font-size:12px;color:var(--muted);font-weight:500}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:12px 10px;display:flex;align-items:center;gap:10px;min-height:66px;text-align:left;transition:transform .1s,background .15s}
+.tile:active{transform:scale(.97);background:var(--card2)}
+.tile-l{font-size:13px;font-weight:600;line-height:1.25;min-width:0;hyphens:auto;-webkit-hyphens:auto}
+/* Calendar */
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.cal-head b{font-size:16px;font-weight:600;text-transform:capitalize}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.cal-wd{text-align:center;font-size:11px;color:var(--muted);font-weight:600;padding:6px 0;text-transform:uppercase;letter-spacing:.04em}
+.cal-cell{aspect-ratio:1;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:500;position:relative;font-size:14px}
+.cal-cell:hover{background:var(--card2)}
+.cal-cell.other{color:var(--muted);opacity:.45}
+.cal-cell.today{color:var(--accent);font-weight:700}
+.cal-cell.sel{background:var(--accent);color:var(--accent-t);font-weight:600}
+.cal-cell .dot{width:5px;height:5px;border-radius:50%;background:var(--accent);position:absolute;bottom:6px}
+.cal-cell.sel .dot{background:#fff}
+.day-title{text-transform:none}
+.tm{font-weight:600;color:var(--c,var(--accent));font-variant-numeric:tabular-nums;margin-right:6px}
+/* Clock */
+.clock-big{font-size:60px;font-weight:600;text-align:center;letter-spacing:-.03em;margin:24px 0 4px;font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}
+.clock-date{text-align:center;color:var(--muted);margin-bottom:8px}
+.wc-time{font-size:20px;font-weight:600;font-variant-numeric:tabular-nums}
+.tmr-inputs{display:flex;gap:10px;align-items:center;justify-content:center;margin:24px 0 16px}
+.tmr-inputs input{width:104px;text-align:center;font-size:34px;font-weight:600;padding:10px}
+.tmr-inputs span{font-size:32px;font-weight:600;color:var(--muted)}
+.presets{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+/* Week */
+.week-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:6px}
+.week-head div{text-align:center}
+.week-head b{font-weight:600}
+.week-head small{display:block;color:var(--muted);font-size:12px}
+.day-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:10px 12px 10px 14px;margin-bottom:8px}
+.day-card.today{border-color:color-mix(in srgb,var(--accent) 60%,var(--border));box-shadow:0 0 0 1px color-mix(in srgb,var(--accent) 30%,transparent)}
+.day-card header{display:flex;justify-content:space-between;align-items:center}
+.day-card header b{text-transform:capitalize;font-weight:600}
+.day-card header small{color:var(--muted);margin-left:8px;font-size:12.5px}
+.day-card.today header b{color:var(--accent)}
+.day-entry{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--border)}
+.day-entry:first-of-type{margin-top:6px}
+.day-entry .t{flex:1;cursor:pointer;overflow-wrap:anywhere}
+.day-entry.done .t{text-decoration:line-through;color:var(--muted)}
+/* Notes */
+.notes-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(min-width:600px){.notes-grid{grid-template-columns:repeat(3,1fr)}}
+.note-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px;text-align:left;display:flex;flex-direction:column;gap:6px;min-height:120px}
+.note-t{font-weight:600;overflow-wrap:anywhere}
+.note-b{color:var(--muted);font-size:13px;flex:1;overflow:hidden;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;white-space:pre-wrap;overflow-wrap:anywhere}
+.note-d{font-size:11px;color:var(--muted)}
+.notes-grid .empty{grid-column:1/-1}
+.note-title-in{font-size:22px;font-weight:700;background:transparent;border:0;padding:6px 2px;margin-bottom:4px;letter-spacing:-.01em}
+.note-body-in{background:transparent;border:0;padding:6px 2px;min-height:calc(100vh - 200px);resize:none;line-height:1.6}
+.note-title-in:focus,.note-body-in:focus{border:0;box-shadow:none}
+/* Passwords */
+.avatar{width:40px;height:40px;border-radius:12px;background:color-mix(in srgb,var(--c) 16%,transparent);color:var(--c);display:grid;place-items:center;font-weight:700;flex:none;font-size:16px}
+.kv{display:flex;align-items:center;gap:8px;padding:11px 0;border-bottom:1px solid var(--border)}
+.kv:last-child{border-bottom:0}
+.kv span{color:var(--muted);font-size:12.5px;width:96px;flex:none}
+.kv b{flex:1;font-weight:500;overflow-wrap:anywhere;min-width:0;white-space:pre-wrap}
+/* Calculator */
+.calc-display{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:20px;text-align:right;margin-bottom:12px;min-height:128px;display:flex;flex-direction:column;justify-content:flex-end}
+.calc-expr{font-size:36px;font-weight:500;overflow-wrap:anywhere;line-height:1.15;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.calc-prev{color:var(--muted);font-size:18px;min-height:26px;margin-top:6px;font-variant-numeric:tabular-nums}
+.calc-keys{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.calc-keys button{height:62px;border-radius:16px;background:var(--card);border:1px solid var(--border);font-size:22px;font-weight:500;display:grid;place-items:center}
+.calc-keys button:active{background:var(--card2)}
+.calc-keys .op{background:color-mix(in srgb,var(--accent) 14%,var(--card));color:var(--accent);border-color:transparent;font-size:24px}
+.calc-keys .eq{background:var(--accent);color:var(--accent-t);grid-column:span 4;border-color:transparent}
+.calc-keys .fn{color:var(--muted);font-size:18px}
+/* Money */
+.money-hero{background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;border-radius:20px;padding:20px;margin-bottom:14px;box-shadow:0 12px 30px rgba(79,70,229,.3)}
+.mh-cur{display:block;width:100%;text-align:left;color:#fff}
+.mh-cur span,.mh-grid span{display:block;font-size:12.5px;opacity:.8;font-weight:500}
+.mh-cur b{display:block;font-size:38px;font-weight:700;letter-spacing:-.03em;margin-top:2px;font-variant-numeric:tabular-nums}
+.mh-cur .mh-edit{display:inline-flex;align-items:center;gap:6px;font-size:12px;opacity:.85;margin-top:6px;background:rgba(255,255,255,.15);padding:4px 10px;border-radius:99px}
+.mh-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,.2)}
+.mh-grid b{font-size:19px;font-weight:600;font-variant-numeric:tabular-nums}
+.money-hero .neg{color:#fecaca}
+.amt{font-weight:600;white-space:nowrap;font-variant-numeric:tabular-nums}
+/* Currency */
+.cur-row{display:flex;gap:10px;align-items:center}
+.cur-row input{font-size:26px;font-weight:600;flex:1;min-width:0}
+.cur-row select{width:auto;max-width:60%;font-weight:600;padding:12px 8px}
+.cur-fixed{font-weight:600;padding:0 16px;background:var(--card2);border:1px solid var(--border);border-radius:12px;height:52px;display:grid;place-items:center;white-space:nowrap}
+.cur-res{flex:1;font-size:26px;font-weight:700;min-width:0;overflow-wrap:anywhere;padding:8px 2px;font-variant-numeric:tabular-nums}
+.swap{display:grid;place-items:center;margin:10px auto;width:40px;height:40px;border-radius:12px;background:var(--card2);border:1px solid var(--border);color:var(--accent)}
+/* Brawl */
+.bs-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(min-width:600px){.bs-grid{grid-template-columns:repeat(3,1fr)}}
+.bs-card{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;text-align:left;display:flex;flex-direction:column}
+.bs-card img,.bs-ph{width:100%;aspect-ratio:16/10;object-fit:cover;background:var(--card2);display:grid;place-items:center;color:var(--muted)}
+.bs-title{padding:10px 12px 12px;font-weight:600;overflow-wrap:anywhere;display:flex;align-items:center;justify-content:space-between;gap:6px}
+.bs-title .ic{color:var(--muted)}
+.bs-hero{width:100%;border-radius:16px;margin-bottom:12px;max-height:60vh;object-fit:contain;background:var(--card2);display:block}
+/* Modal */
+.modal-wrap{position:fixed;inset:0;background:rgba(5,7,12,.6);backdrop-filter:blur(2px);z-index:40;display:flex;align-items:flex-end;justify-content:center;animation:fade .15s}
+.modal-wrap.top{z-index:80}
+@media(min-width:600px){.modal-wrap{align-items:center}}
+.modal{background:var(--card);width:100%;max-width:520px;border-radius:24px 24px 0 0;padding:8px 18px calc(18px + env(safe-area-inset-bottom));max-height:92vh;overflow:auto;animation:up .22s cubic-bezier(.2,.8,.2,1);border:1px solid var(--border);border-bottom:0}
+.modal::before{content:"";display:block;width:36px;height:4px;border-radius:9px;background:var(--border2);margin:2px auto 14px}
+@media(min-width:600px){.modal{border-radius:24px;border-bottom:1px solid var(--border)}}
+.modal h2{margin:0 0 14px;font-size:18px;font-weight:600;letter-spacing:-.01em}
+.modal-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap}
+.modal-btns .left{margin-right:auto}
+.field{display:block;margin-bottom:14px}
+.field>span{display:block;font-size:12.5px;color:var(--muted);margin-bottom:6px;font-weight:500}
+.pw-row{display:flex;gap:6px;align-items:center}
+.pw-row input{flex:1}
+.pw-row .icon-btn{background:var(--card2);border:1px solid var(--border);width:44px;height:44px}
+.img-pick{display:block;border:1.5px dashed var(--border2);border-radius:14px;overflow:hidden;cursor:pointer;text-align:center}
+.img-pick img{width:100%;max-height:220px;object-fit:cover;display:block}
+.img-ph{display:flex;flex-direction:column;align-items:center;gap:8px;padding:26px;color:var(--muted);font-size:13.5px}
+/* PIN */
+.pin-overlay{position:fixed;inset:0;z-index:50;background:rgba(5,7,12,.6);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;animation:fade .15s;padding:16px}
+.pin-overlay.full{z-index:60;background:var(--bg);backdrop-filter:none}
+.pin-box{background:var(--card);border:1px solid var(--border);border-radius:28px;padding:28px 20px 22px;width:100%;max-width:340px;text-align:center;box-shadow:var(--shadow)}
+.pin-overlay.full .pin-box{background:transparent;box-shadow:none;border:0}
+.pin-logo{width:56px;height:56px;border-radius:18px;background:color-mix(in srgb,var(--accent) 15%,transparent);color:var(--accent);display:grid;place-items:center;margin:0 auto}
+.pin-title{font-size:19px;font-weight:600;margin-top:14px;letter-spacing:-.01em}
+.pin-sub{color:var(--muted);font-size:13.5px;margin-top:4px;min-height:18px;line-height:1.45}
+.pin-dots{display:flex;gap:14px;justify-content:center;margin:24px 0 8px}
+.pin-dots i{width:13px;height:13px;border-radius:50%;background:var(--border2);transition:.15s}
+.pin-dots i.on{background:var(--accent);transform:scale(1.15)}
+.pin-dots.shake{animation:shake .35s}
+.pin-err{color:var(--danger);font-size:13px;min-height:20px;margin-bottom:12px;font-weight:500}
+.pin-keys{display:grid;grid-template-columns:repeat(3,1fr);gap:14px 18px;max-width:270px;margin:0 auto}
+.pin-keys button{height:68px;width:68px;border-radius:50%;margin:0 auto;font-size:25px;font-weight:500;background:var(--card2);display:grid;place-items:center;transition:background .1s}
+.pin-overlay:not(.full) .pin-keys button{background:var(--bg)}
+.pin-keys button:active{background:var(--accent);color:var(--accent-t)}
+.pin-keys .pk-txt{background:transparent!important;font-size:13.5px;font-weight:600;color:var(--muted)}
+.pin-overlay.busy .pin-keys{opacity:.5;pointer-events:none}
+.pin-extra{margin-top:20px}
+.link{color:var(--accent);font-weight:600;font-size:13.5px}
+.lang-pick{display:flex;flex-direction:column;gap:10px;margin-top:28px}
+.lang-pick .btn{justify-content:flex-start;padding:16px;font-size:15px;border-radius:14px;background:var(--card);gap:12px}
+.lang-pick .btn .code{width:34px;height:24px;border-radius:6px;background:var(--card2);display:grid;place-items:center;font-size:11px;font-weight:700;color:var(--muted)}
+.lang-pick .btn .ic:last-child{margin-left:auto;color:var(--muted)}
+/* Toast */
+#toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);background:var(--text);color:var(--bg);padding:10px 16px;border-radius:12px;font-weight:600;font-size:13.5px;opacity:0;pointer-events:none;transition:.25s;z-index:90;max-width:90vw;text-align:center;box-shadow:var(--shadow)}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+@keyframes fade{from{opacity:0}}
+@keyframes up{from{transform:translateY(40px);opacity:.5}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="toast"></div>
+<noscript>JavaScript required.</noscript>
+<script>
+'use strict';
+/* =====================================================================
+   PocketHub – all-in-one personal app (PWA)
+   All data is stored locally on the device in IndexedDB.
+   ===================================================================== */
+const APP_VERSION = '1.1.0';
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+const pad2 = n => String(n).padStart(2, '0');
+
+/* ------------------------------ Icons (line icons, 24px grid) ------------------------------ */
+const ICONS = {
+  calendar: '<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+  calendarDays: '<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"/>',
+  clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  bell: '<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>',
+  listChecks: '<path d="m3 17 2 2 4-4M3 7l2 2 4-4M13 6h8M13 12h8M13 18h8"/>',
+  squareCheck: '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="m9 12 2 2 4-4"/>',
+  fileText: '<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/>',
+  lock: '<rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
+  key: '<circle cx="7.5" cy="15.5" r="4.5"/><path d="m10.7 12.3 9.8-9.8M17 6l3 3M14.5 8.5l2 2"/>',
+  calculator: '<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M8 6h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h.01M8 18.5h.01M12 18.5h.01M16 18.5h.01"/>',
+  wallet: '<path d="M19 7V5a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H5a2 2 0 0 1-2-2V6"/><path d="M17 14h.01"/>',
+  euro: '<path d="M18 7.5A7 7 0 1 0 18 16.5M4 10h10M4 14h9"/>',
+  gamepad: '<path d="M6 12h4M8 10v4M15 13h.01M18 11h.01"/><path d="M17.3 5H6.7a4 4 0 0 0-4 3.6l-.7 6.1A3 3 0 0 0 5 18c1 0 1.8-.5 2.3-1.2l1.4-1.8h6.6l1.4 1.8c.5.7 1.3 1.2 2.3 1.2a3 3 0 0 0 3-3.3l-.7-6.1A4 4 0 0 0 17.3 5z"/>',
+  settings: '<path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/>',
+  chevLeft: '<path d="m15 18-6-6 6-6"/>',
+  chevRight: '<path d="m9 18 6-6-6-6"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  x: '<path d="M18 6 6 18M6 6l12 12"/>',
+  check: '<path d="M20 6 9 17l-5-5"/>',
+  pencil: '<path d="M17 3a2.85 2.85 0 0 1 4 4L7.5 20.5 2 22l1.5-5.5z"/>',
+  trash: '<path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6"/>',
+  rotate: '<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/>',
+  eye: '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+  copy: '<rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
+  refresh: '<path d="M21 12a9 9 0 0 1-15 6.7L3 16M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5M3 21v-5h5"/>',
+  image: '<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/>',
+  swap: '<path d="m3 16 4 4 4-4M7 20V4M21 8l-4-4-4 4M17 4v16"/>',
+  download: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>',
+  upload: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>',
+  search: '<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>',
+  globe: '<circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20"/>',
+  contrast: '<circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/>',
+  shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+  database: '<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.7 4 3 9 3s9-1.3 9-3V5M3 12c0 1.7 4 3 9 3s9-1.3 9-3"/>',
+  alert: '<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/>',
+  repeat: '<path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14M7 22l-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/>',
+  info: '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>',
+  backspace: '<path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/><path d="m18 9-6 6M12 9l6 6"/>',
+  timer: '<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M10 2h4"/>',
+  inbox: '<path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>',
+  logo: '<rect x="3" y="3" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2"/><circle cx="17.25" cy="17.25" r="3.75"/>',
+  help: '<circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01"/>',
+};
+const ic = (n, size = 20, sw = 2) => `<svg class="ic" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[n] || ''}</svg>`;
+const MODS = {
+  calendar: { icon: 'calendar', color: '#3b82f6' }, week: { icon: 'calendarDays', color: '#6366f1' }, reminders: { icon: 'bell', color: '#f59e0b' },
+  todos: { icon: 'squareCheck', color: '#10b981' }, checklists: { icon: 'listChecks', color: '#14b8a6' }, notes: { icon: 'fileText', color: '#eab308' },
+  secret: { icon: 'lock', color: '#f43f5e' }, passwords: { icon: 'key', color: '#8b5cf6' }, brawl: { icon: 'gamepad', color: '#ec4899' },
+  clock: { icon: 'clock', color: '#0ea5e9' }, calc: { icon: 'calculator', color: '#64748b' }, money: { icon: 'wallet', color: '#22c55e' },
+  currency: { icon: 'euro', color: '#06b6d4' }, settings: { icon: 'settings', color: '#64748b' },
+};
+const chipIc = (mod, size = 40) => `<span class="ichip" style="--c:${MODS[mod].color};width:${size}px;height:${size}px">${ic(MODS[mod].icon, Math.round(size * 0.5))}</span>`;
+const iconBtn = (act, icon, title, attrs = '', cls = '') => `<button class="icon-btn ${cls}" data-act="${act}" ${attrs} title="${esc(title)}" aria-label="${esc(title)}">${ic(icon)}</button>`;
+const checkBtn = (on, act, id) => `<button class="check ${on ? 'on' : ''}" data-act="${act}" data-id="${id}" aria-label="done">${ic('check', 14, 3)}</button>`;
+const AVATAR_COLORS = ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#06b6d4', '#ef4444', '#6366f1'];
+const avatarColor = s => { let h = 0; for (const c of String(s)) h = (h * 31 + c.charCodeAt(0)) >>> 0; return AVATAR_COLORS[h % AVATAR_COLORS.length]; };
+
+/* ------------------------------ i18n ------------------------------ */
+const I18N = {
+  de: {
+    m_calendar: 'Kalender', m_clock: 'Uhr', m_reminders: 'Erinnerungen', m_checklists: 'Checklisten', m_week: 'Wochenplaner',
+    m_todos: 'To-dos', m_notes: 'Notizen', m_secret: 'Geheime Notizen', m_passwords: 'Passwörter', m_calc: 'Rechner',
+    m_money: 'Virtuelles Geld', m_currency: 'Währungsrechner', m_brawl: 'Brawl Stars Accounts', m_settings: 'Einstellungen',
+    g_plan: 'Planen', g_private: 'Notizen & Privates', g_tools: 'Werkzeuge',
+    greet_m: 'Guten Morgen', greet_d: 'Guten Tag', greet_e: 'Guten Abend',
+    ov_events: 'Termine heute', ov_todos: 'Offene To-dos', ov_balance: 'Kontostand', ov_next: 'Nächste Erinnerung', ov_none: 'Keine geplant',
+    back: 'Zurück', save: 'Speichern', cancel: 'Abbrechen', delete: 'Löschen', edit: 'Bearbeiten', close: 'Schließen', ok: 'OK',
+    add: 'Hinzufügen', title: 'Titel', note: 'Notiz', date: 'Datum', timeOpt: 'Uhrzeit (optional)', search: 'Suchen',
+    confirmDelete: 'Wirklich löschen?', saveError: 'Speichern fehlgeschlagen!', copied: 'Kopiert', untitled: 'Ohne Titel',
+    nothingHere: 'Noch keine Einträge. Tippe auf +, um etwas hinzuzufügen.', today: 'Heute', notFound: 'Nicht gefunden.', lock: 'Sperren',
+    enterPin: 'PIN eingeben', enterPinSub: 'Gib deine 4-stellige PIN ein', enterPinOpen: 'Geschützter Bereich',
+    wrongPin: 'Falsche PIN', lockedFor: 'Zu viele Versuche. Warte {0} s.', createPin: 'PIN erstellen',
+    createPinSub: 'Wähle eine 4-stellige PIN. Du brauchst sie zum Öffnen der App und für geschützte Bereiche.',
+    confirmPin: 'PIN bestätigen', confirmPinSub: 'Gib die PIN noch einmal ein', pinMismatch: 'PINs stimmen nicht überein',
+    forgotPin: 'PIN vergessen?', forgotText: 'Ohne PIN können die verschlüsselten Daten nicht wiederhergestellt werden. Du kannst die App zurücksetzen – dabei werden ALLE Daten gelöscht.',
+    resetApp: 'App zurücksetzen', resetConfirm2: 'Letzte Warnung: Alle Daten werden unwiderruflich gelöscht. Fortfahren?',
+    currentPin: 'Aktuelle PIN', newPin: 'Neue PIN', pinChanged: 'PIN geändert', chooseLang: 'Sprache wählen',
+    newEvent: 'Neuer Termin', editEvent: 'Termin bearbeiten', noItemsDay: 'Keine Einträge an diesem Tag.', event: 'Termin',
+    ct_clock: 'Uhr', ct_stopwatch: 'Stoppuhr', ct_timer: 'Timer', worldClock: 'Weltuhr', addCity: 'Stadt hinzufügen',
+    chooseCity: 'Stadt wählen', start: 'Start', pause: 'Pause', resume: 'Weiter', reset: 'Zurücksetzen', lap: 'Runde',
+    min: 'Min', sec: 'Sek', timerDone: 'Timer abgelaufen', setTime: 'Bitte eine Zeit einstellen',
+    newReminder: 'Neue Erinnerung', editReminder: 'Erinnerung bearbeiten', when: 'Wann', repeat: 'Wiederholen',
+    rep_none: 'Nie', rep_daily: 'Täglich', rep_weekly: 'Wöchentlich', rep_monthly: 'Monatlich',
+    overdue: 'Überfällig', upcoming: 'Anstehend', doneSec: 'Erledigt', reminder: 'Erinnerung',
+    notifHint: 'Erlaube Benachrichtigungen, damit Erinnerungen und Timer dich benachrichtigen.', allow: 'Erlauben',
+    remLimit: 'Hinweis: Als Web-App klingeln Erinnerungen zuverlässig, solange die App geöffnet ist oder im Hintergrund läuft. Verpasste Erinnerungen werden beim nächsten Öffnen angezeigt.',
+    notifDenied: 'Benachrichtigungen sind blockiert. Erlaube sie in den Android-/Browser-Einstellungen.',
+    newChecklist: 'Neue Checkliste', rename: 'Umbenennen', newItem: 'Neuer Punkt…', uncheckAll: 'Alle Haken entfernen',
+    editItem: 'Punkt bearbeiten', text: 'Text', items: 'Punkte',
+    weekShort: 'KW', newEntry: 'Neuer Eintrag', editEntry: 'Eintrag bearbeiten', thisWeek: 'Diese Woche',
+    newTodo: 'Neue Aufgabe…', editTodo: 'Aufgabe bearbeiten', priority: 'Priorität', pr_high: 'Hoch', pr_normal: 'Normal', pr_low: 'Niedrig',
+    dueOpt: 'Fällig am (optional)', f_open: 'Offen', f_done: 'Erledigt', f_all: 'Alle', clearDone: 'Erledigte löschen', due: 'fällig',
+    noteBody: 'Schreibe etwas…', secretInfo: 'Verschlüsselt mit deiner PIN. Nur nach PIN-Eingabe lesbar.',
+    newPassword: 'Neues Passwort', editPassword: 'Passwort bearbeiten', site: 'Name / Website', username: 'Benutzername / E-Mail',
+    password: 'Passwort', url: 'Link (optional)', generate: 'Generieren', show: 'Anzeigen', copy: 'Kopieren',
+    history: 'Verlauf', clearHistory: 'Verlauf löschen', calcError: 'Fehler',
+    mnCurrent: 'Aktueller Stand', mnAdjust: 'Anpassen', mnPlanned: 'Geplant', mnProjected: 'Danach hättest du',
+    mnPlannedList: 'Geplante Einnahmen & Ausgaben', mnDoneList: 'Verlauf (erledigt)', mnAfter: 'danach',
+    mnHint: 'Trage geplante Einnahmen (z. B. „Flöte verkaufen +50 €“) und Ausgaben ein, um zu sehen, wie viel du danach hättest.',
+    newMoney: 'Neuer Eintrag', editMoney: 'Eintrag bearbeiten', kind: 'Art', income: 'Einnahme', expense: 'Ausgabe',
+    amount: 'Betrag (€)', status: 'Status', st_planned: 'Geplant', st_done: 'Erledigt', setBalance: 'Aktuellen Stand festlegen',
+    balance: 'Betrag in €', invalidAmount: 'Ungültiger Betrag',
+    allCurrencies: 'Alle Währungen', refresh: 'Kurse aktualisieren', ratesFrom: 'Kurse vom {0} (Europäische Zentralbank)',
+    ratesOffline: 'Ungefähre Offline-Kurse – verbinde dich mit dem Internet für aktuelle Kurse.', ratesFail: 'Kurse konnten nicht geladen werden',
+    ratesOk: 'Kurse aktualisiert',
+    brawlHint: 'Bild und Titel sind sichtbar. Für die Details brauchst du deine PIN.', newAccount: 'Neuer Account',
+    editAccount: 'Account bearbeiten', image: 'Bild', chooseImage: 'Bild auswählen', playerTag: 'Spieler-Tag', trophies: 'Trophäen',
+    login: 'Login (E-Mail / Supercell ID)', notes: 'Notizen', noDetails: 'Noch keine Details. Tippe oben auf Bearbeiten.', imageError: 'Bild konnte nicht geladen werden',
+    language: 'Sprache', theme: 'Design', th_system: 'System', th_light: 'Hell', th_dark: 'Dunkel',
+    autolock: 'Automatisch sperren', al_0: 'Sofort', autolockHint: 'Nach dieser Zeit im Hintergrund fragt die App wieder nach der PIN.',
+    security: 'Sicherheit', changePin: 'PIN ändern', notifications: 'Benachrichtigungen',
+    notifOn: 'Benachrichtigungen sind erlaubt.', notifOff: 'Benachrichtigungen sind nicht erlaubt.', notifNA: 'Nicht verfügbar',
+    storage: 'Speicher & Backup', persistOn: 'Daten sind dauerhaft gespeichert.', persistOff: 'Speicher nicht als dauerhaft markiert (Daten bleiben trotzdem, bis du sie löschst).',
+    exportBackup: 'Backup exportieren', importBackup: 'Backup importieren',
+    backupHint: 'Das Backup enthält alle Daten. Geheime Daten bleiben verschlüsselt – zum Öffnen brauchst du die PIN, die beim Export galt.',
+    exported: 'Backup gespeichert', importBad: 'Ungültige Backup-Datei', importConfirm: 'Alle aktuellen Daten werden durch das Backup ersetzt. Fortfahren?',
+    import: 'Importieren', dangerZone: 'Gefahrenzone', deleteAll: 'Alle Daten löschen',
+    deleteAllConfirm: 'ALLE Daten (Notizen, Passwörter, Accounts …) werden unwiderruflich gelöscht. Fortfahren?',
+    aboutText: 'Alle Daten bleiben nur auf diesem Gerät gespeichert – für immer, bis du sie löschst.',
+  },
+  en: {
+    m_calendar: 'Calendar', m_clock: 'Clock', m_reminders: 'Reminders', m_checklists: 'Checklists', m_week: 'Week planner',
+    m_todos: 'To-dos', m_notes: 'Notes', m_secret: 'Secret notes', m_passwords: 'Passwords', m_calc: 'Calculator',
+    m_money: 'Virtual money', m_currency: 'Currency converter', m_brawl: 'Brawl Stars accounts', m_settings: 'Settings',
+    g_plan: 'Plan', g_private: 'Notes & private', g_tools: 'Tools',
+    greet_m: 'Good morning', greet_d: 'Good afternoon', greet_e: 'Good evening',
+    ov_events: 'Events today', ov_todos: 'Open to-dos', ov_balance: 'Balance', ov_next: 'Next reminder', ov_none: 'None scheduled',
+    back: 'Back', save: 'Save', cancel: 'Cancel', delete: 'Delete', edit: 'Edit', close: 'Close', ok: 'OK',
+    add: 'Add', title: 'Title', note: 'Note', date: 'Date', timeOpt: 'Time (optional)', search: 'Search',
+    confirmDelete: 'Really delete?', saveError: 'Saving failed!', copied: 'Copied', untitled: 'Untitled',
+    nothingHere: 'No entries yet. Tap + to add something.', today: 'Today', notFound: 'Not found.', lock: 'Lock',
+    enterPin: 'Enter PIN', enterPinSub: 'Enter your 4-digit PIN', enterPinOpen: 'Protected area',
+    wrongPin: 'Wrong PIN', lockedFor: 'Too many attempts. Wait {0} s.', createPin: 'Create PIN',
+    createPinSub: 'Choose a 4-digit PIN. You need it to open the app and the protected areas.',
+    confirmPin: 'Confirm PIN', confirmPinSub: 'Enter the PIN again', pinMismatch: 'PINs do not match',
+    forgotPin: 'Forgot PIN?', forgotText: 'Without the PIN the encrypted data cannot be recovered. You can reset the app – this deletes ALL data.',
+    resetApp: 'Reset app', resetConfirm2: 'Last warning: all data will be deleted permanently. Continue?',
+    currentPin: 'Current PIN', newPin: 'New PIN', pinChanged: 'PIN changed', chooseLang: 'Choose language',
+    newEvent: 'New event', editEvent: 'Edit event', noItemsDay: 'No entries on this day.', event: 'Event',
+    ct_clock: 'Clock', ct_stopwatch: 'Stopwatch', ct_timer: 'Timer', worldClock: 'World clock', addCity: 'Add city',
+    chooseCity: 'Choose city', start: 'Start', pause: 'Pause', resume: 'Resume', reset: 'Reset', lap: 'Lap',
+    min: 'Min', sec: 'Sec', timerDone: 'Timer finished', setTime: 'Please set a time',
+    newReminder: 'New reminder', editReminder: 'Edit reminder', when: 'When', repeat: 'Repeat',
+    rep_none: 'Never', rep_daily: 'Daily', rep_weekly: 'Weekly', rep_monthly: 'Monthly',
+    overdue: 'Overdue', upcoming: 'Upcoming', doneSec: 'Done', reminder: 'Reminder',
+    notifHint: 'Allow notifications so reminders and timers can notify you.', allow: 'Allow',
+    remLimit: 'Note: as a web app, reminders ring reliably while the app is open or running in the background. Missed reminders are shown the next time you open the app.',
+    notifDenied: 'Notifications are blocked. Allow them in your Android/browser settings.',
+    newChecklist: 'New checklist', rename: 'Rename', newItem: 'New item…', uncheckAll: 'Uncheck all',
+    editItem: 'Edit item', text: 'Text', items: 'items',
+    weekShort: 'Wk', newEntry: 'New entry', editEntry: 'Edit entry', thisWeek: 'This week',
+    newTodo: 'New task…', editTodo: 'Edit task', priority: 'Priority', pr_high: 'High', pr_normal: 'Normal', pr_low: 'Low',
+    dueOpt: 'Due date (optional)', f_open: 'Open', f_done: 'Done', f_all: 'All', clearDone: 'Delete done', due: 'due',
+    noteBody: 'Write something…', secretInfo: 'Encrypted with your PIN. Only readable after entering the PIN.',
+    newPassword: 'New password', editPassword: 'Edit password', site: 'Name / website', username: 'Username / email',
+    password: 'Password', url: 'Link (optional)', generate: 'Generate', show: 'Show', copy: 'Copy',
+    history: 'History', clearHistory: 'Clear history', calcError: 'Error',
+    mnCurrent: 'Current balance', mnAdjust: 'Adjust', mnPlanned: 'Planned', mnProjected: 'Afterwards you would have',
+    mnPlannedList: 'Planned income & expenses', mnDoneList: 'History (done)', mnAfter: 'then',
+    mnHint: 'Add planned income (e.g. “sell flute +€50”) and expenses to see how much you would have afterwards.',
+    newMoney: 'New entry', editMoney: 'Edit entry', kind: 'Type', income: 'Income', expense: 'Expense',
+    amount: 'Amount (€)', status: 'Status', st_planned: 'Planned', st_done: 'Done', setBalance: 'Set current balance',
+    balance: 'Amount in €', invalidAmount: 'Invalid amount',
+    allCurrencies: 'All currencies', refresh: 'Refresh rates', ratesFrom: 'Rates from {0} (European Central Bank)',
+    ratesOffline: 'Approximate offline rates – connect to the internet for current rates.', ratesFail: 'Could not load rates',
+    ratesOk: 'Rates updated',
+    brawlHint: 'Image and title are visible. You need your PIN for the details.', newAccount: 'New account',
+    editAccount: 'Edit account', image: 'Image', chooseImage: 'Choose image', playerTag: 'Player tag', trophies: 'Trophies',
+    login: 'Login (email / Supercell ID)', notes: 'Notes', noDetails: 'No details yet. Tap Edit at the top.', imageError: 'Could not load image',
+    language: 'Language', theme: 'Theme', th_system: 'System', th_light: 'Light', th_dark: 'Dark',
+    autolock: 'Auto-lock', al_0: 'Immediately', autolockHint: 'After this time in the background the app asks for the PIN again.',
+    security: 'Security', changePin: 'Change PIN', notifications: 'Notifications',
+    notifOn: 'Notifications are allowed.', notifOff: 'Notifications are not allowed.', notifNA: 'Not available',
+    storage: 'Storage & backup', persistOn: 'Data is stored persistently.', persistOff: 'Storage not marked as persistent (data still stays until you delete it).',
+    exportBackup: 'Export backup', importBackup: 'Import backup',
+    backupHint: 'The backup contains all data. Secret data stays encrypted – you need the PIN that was active at export time.',
+    exported: 'Backup saved', importBad: 'Invalid backup file', importConfirm: 'All current data will be replaced by the backup. Continue?',
+    import: 'Import', dangerZone: 'Danger zone', deleteAll: 'Delete all data',
+    deleteAllConfirm: 'ALL data (notes, passwords, accounts …) will be deleted permanently. Continue?',
+    aboutText: 'All data is stored only on this device – forever, until you delete it.',
+  }
+};
+const L = () => (S.settings && S.settings.lang) || 'de';
+const LOC = () => L() === 'de' ? 'de-DE' : 'en-GB';
+function t(k, ...a) {
+  let s = I18N[L()][k] ?? I18N.en[k] ?? k;
+  a.forEach((v, i) => { s = s.replace('{' + i + '}', v); });
+  return s;
+}
+
+/* ---------------------------- Formatting ---------------------------- */
+const iso = d => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+const fromIso = s => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
+const today = () => iso(new Date());
+const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
+const startOfWeek = d => { const x = new Date(d.getFullYear(), d.getMonth(), d.getDate()); x.setDate(x.getDate() - (x.getDay() + 6) % 7); return x; };
+const toLocalDT = d => `${iso(d)}T${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+function isoWeek(d) {
+  const x = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  const day = x.getUTCDay() || 7; x.setUTCDate(x.getUTCDate() + 4 - day);
+  const y0 = new Date(Date.UTC(x.getUTCFullYear(), 0, 1));
+  return Math.ceil(((x - y0) / 86400000 + 1) / 7);
+}
+const fmtDate = (d, o = { day: '2-digit', month: '2-digit', year: 'numeric' }) => new Intl.DateTimeFormat(LOC(), o).format(d);
+const fmtTime = (d, sec = false) => new Intl.DateTimeFormat(LOC(), sec ? { hour: '2-digit', minute: '2-digit', second: '2-digit' } : { hour: '2-digit', minute: '2-digit' }).format(d);
+const fmtDateTime = d => `${fmtDate(d, { weekday: 'short', day: '2-digit', month: '2-digit', year: 'numeric' })}, ${fmtTime(d)}`;
+const fmtShortDT = d => `${fmtDate(d, { weekday: 'short', day: 'numeric', month: 'short' })}, ${fmtTime(d)}`;
+const fmtCents = c => new Intl.NumberFormat(LOC(), { style: 'currency', currency: 'EUR' }).format(c / 100);
+const fmtSigned = c => (c > 0 ? '+' : '') + fmtCents(c);
+const fmtHMS = s => { s = Math.ceil(s); const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), x = s % 60; return (h ? h + ':' + pad2(m) : pad2(m)) + ':' + pad2(x); };
+function parseAmount(str) {
+  let s = String(str || '').replace(/[\s€+]/g, '');
+  if (s.includes('.') && s.includes(',')) s = s.replace(/\./g, '').replace(',', '.');
+  else s = s.replace(',', '.');
+  if (!/^-?\d*\.?\d+$|^-?\d+\.$/.test(s)) return NaN;
+  const n = Number(s);
+  return isFinite(n) ? Math.round(n * 100) : NaN;
+}
+
+/* ------------------------------ Storage ------------------------------ */
+const DB = {
+  db: null,
+  open() {
+    return new Promise((res, rej) => {
+      const r = indexedDB.open('pockethub', 1);
+      r.onupgradeneeded = () => r.result.createObjectStore('kv');
+      r.onsuccess = () => { this.db = r.result; res(); };
+      r.onerror = () => rej(r.error);
+    });
+  },
+  getAll() {
+    return new Promise((res, rej) => {
+      const out = {}; const rq = this.db.transaction('kv').objectStore('kv').openCursor();
+      rq.onsuccess = () => { const c = rq.result; if (c) { out[c.key] = c.value; c.continue(); } else res(out); };
+      rq.onerror = () => rej(rq.error);
+    });
+  },
+  set(k, v) {
+    return new Promise((res, rej) => {
+      const tx = this.db.transaction('kv', 'readwrite'); tx.objectStore('kv').put(v, k);
+      tx.oncomplete = () => res(); tx.onerror = () => rej(tx.error); tx.onabort = () => rej(tx.error);
+    });
+  },
+  clear() {
+    return new Promise((res, rej) => {
+      const tx = this.db.transaction('kv', 'readwrite'); tx.objectStore('kv').clear();
+      tx.oncomplete = () => res(); tx.onerror = () => rej(tx.error);
+    });
+  }
+};
+const DEFAULTS = () => ({
+  settings: { lang: (navigator.language || 'de').toLowerCase().startsWith('de') ? 'de' : 'en', theme: 'system', autolock: 60, worldClocks: ['Europe/London', 'America/New_York', 'Asia/Tokyo'], cur: { amt: '100', code: 'USD', dir: 'from' } },
+  lockout: { fails: 0, until: 0 },
+  events: [], reminders: [], checklists: [], week: [], todos: [], notes: [],
+  money: { start: 0, entries: [] }, rates: null, calcHistory: [], brawl: [],
+  crypto: null, vault: null,
+});
+let S = DEFAULTS();
+function save(...keys) {
+  for (const k of keys) DB.set(k, S[k]).catch(e => { console.error(e); toast(t('saveError')); });
+}
+const saveTimers = {};
+function saveSoon(k, ms = 400) {
+  clearTimeout(saveTimers[k]);
+  saveTimers[k] = setTimeout(() => { delete saveTimers[k]; save(k); }, ms);
+}
+function flushSaves() {
+  for (const k of Object.keys(saveTimers)) { clearTimeout(saveTimers[k]); delete saveTimers[k]; save(k); }
+  return flushVault();
+}
+
+/* ------------------------------ Crypto ------------------------------ */
+// The PIN derives a key (PBKDF2) that wraps a random data key; the data key encrypts the vault (AES-GCM).
+const enc = new TextEncoder(), dec = new TextDecoder();
+const PBKDF2_ITER = 310000;
+function toB64(u8) { let s = ''; for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000)); return btoa(s); }
+function fromB64(b) { const s = atob(b); const u = new Uint8Array(s.length); for (let i = 0; i < s.length; i++) u[i] = s.charCodeAt(i); return u; }
+async function deriveKEK(pin, salt, iter) {
+  const base = await crypto.subtle.importKey('raw', enc.encode(pin), 'PBKDF2', false, ['deriveKey']);
+  return crypto.subtle.deriveKey({ name: 'PBKDF2', salt, iterations: iter, hash: 'SHA-256' }, base, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
+}
+const importDEK = raw => crypto.subtle.importKey('raw', raw, 'AES-GCM', false, ['encrypt', 'decrypt']);
+async function aesEnc(key, u8) {
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, u8);
+  return { iv: toB64(iv), ct: toB64(new Uint8Array(ct)) };
+}
+async function aesDec(key, o) { return new Uint8Array(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: fromB64(o.iv) }, key, fromB64(o.ct))); }
+const emptyVault = () => ({ notes: [], passwords: [], brawl: {} });
+async function wrapWithPin(pin, raw) {
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const kek = await deriveKEK(pin, salt, PBKDF2_ITER);
+  return { salt: toB64(salt), iter: PBKDF2_ITER, wrapped: await aesEnc(kek, raw) };
+}
+async function setupPin(pin) {
+  const raw = crypto.getRandomValues(new Uint8Array(32));
+  S.crypto = await wrapWithPin(pin, raw);
+  S.vault = await aesEnc(await importDEK(raw), enc.encode(JSON.stringify(emptyVault())));
+  await DB.set('crypto', S.crypto); await DB.set('vault', S.vault);
+}
+async function unwrapRaw(pin) {
+  const c = S.crypto;
+  try { return await aesDec(await deriveKEK(pin, fromB64(c.salt), c.iter), c.wrapped); } catch { return null; }
+}
+const lockoutRemaining = () => Math.max(0, Math.ceil((S.lockout.until - Date.now()) / 1000));
+function registerFail() {
+  S.lockout.fails++;
+  if (S.lockout.fails >= 5) S.lockout.until = Date.now() + Math.min(3600, 30 * 2 ** (S.lockout.fails - 5)) * 1000;
+  save('lockout');
+}
+function resetFails() { if (S.lockout.fails) { S.lockout = { fails: 0, until: 0 }; save('lockout'); } }
+async function checkPin(pin) {
+  let rem = lockoutRemaining();
+  if (rem) return { err: t('lockedFor', rem) };
+  const raw = await unwrapRaw(pin);
+  if (!raw) { registerFail(); rem = lockoutRemaining(); return { err: rem ? t('lockedFor', rem) : t('wrongPin') }; }
+  resetFails();
+  return { raw };
+}
+
+/* Vault session: decrypted secret data, only while inside a secret area */
+let VS = null;
+let vaultTimer = null, vaultPending = null, vaultChain = Promise.resolve();
+function saveVaultSoon() {
+  if (!VS) return;
+  vaultPending = { dek: VS.dek, data: VS.data };
+  clearTimeout(vaultTimer); vaultTimer = setTimeout(flushVault, 400);
+}
+function flushVault() {
+  clearTimeout(vaultTimer);
+  const p = vaultPending; vaultPending = null;
+  if (!p) return vaultChain;
+  const json = JSON.stringify(p.data);
+  vaultChain = vaultChain.then(async () => {
+    S.vault = await aesEnc(p.dek, enc.encode(json));
+    await DB.set('vault', S.vault);
+  }).catch(e => { console.error(e); toast(t('saveError')); });
+  return vaultChain;
+}
+function saveVaultNow() { saveVaultSoon(); return flushVault(); }
+async function openVault(area) {
+  const ok = await pinPad({
+    title: t('enterPinOpen'), subtitle: t('enterPinSub'), cancelable: true,
+    onSubmit: async pin => {
+      const r = await checkPin(pin);
+      if (r.err) return r.err;
+      const dek = await importDEK(r.raw);
+      const data = Object.assign(emptyVault(), JSON.parse(dec.decode(await aesDec(dek, S.vault))));
+      VS = { area, dek, data };
+      return true;
+    }
+  });
+  return !!ok;
+}
+
+/* ------------------------------ UI helpers ------------------------------ */
+let toastTimer;
+function toast(msg) {
+  const el = $('#toast'); el.textContent = msg; el.classList.add('show');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
+}
+async function copyText(s) {
+  try { await navigator.clipboard.writeText(s); }
+  catch {
+    const ta = document.createElement('textarea'); ta.value = s; document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); } catch { } ta.remove();
+  }
+  toast(t('copied'));
+}
+const emptyState = (icon = 'inbox', text = t('nothingHere')) => `<div class="empty"><span class="empty-ic">${ic(icon, 26, 1.8)}</span>${text ? `<p>${esc(text)}</p>` : ''}</div>`;
+const fab = (act, attrs = '') => `<button class="fab" data-act="${act}" ${attrs} aria-label="${t('add')}">${ic('plus', 26, 2.2)}</button>`;
+const searchBox = (value, attrs) => `<div class="search">${ic('search', 18)}<input type="search" placeholder="${t('search')}" value="${esc(value)}" ${attrs}></div>`;
+function page(title, body, { actions = '', backBtn = true } = {}) {
+  return `<header class="bar">${backBtn ? iconBtn('back', 'chevLeft', t('back')) : ''}<h1>${esc(title)}</h1><div class="bar-actions">${actions}</div></header><main class="content">${body}</main>`;
+}
+
+/* History-aware modals: Android back button closes the top modal */
+const modalStack = [];
+const popWaiters = [];
+function popHistory() { return new Promise(r => { popWaiters.push(r); history.back(); }); }
+function registerModal(dismiss) { const entry = { dismiss }; modalStack.push(entry); history.pushState({ m: 1 }, ''); return entry; }
+function unregisterModal(entry) { const i = modalStack.indexOf(entry); if (i >= 0) { modalStack.splice(i, 1); return true; } return false; }
+function dismissAllModals() { while (modalStack.length) modalStack.pop().dismiss(); }
+window.addEventListener('popstate', () => {
+  if (popWaiters.length) { popWaiters.shift()(); return; }
+  if (modalStack.length) { modalStack.pop().dismiss(); return; }
+  render();
+});
+
+const KEEP = Symbol('keep');
+function openModal({ title = '', body = '', buttons = [], onMount, cls = '' }) {
+  return new Promise(resolve => {
+    const wrap = document.createElement('div');
+    wrap.className = 'modal-wrap ' + cls;
+    wrap.innerHTML = `<div class="modal" role="dialog" aria-modal="true">${title ? `<h2>${esc(title)}</h2>` : ''}<div class="modal-body">${body}</div>${buttons.length ? `<div class="modal-btns">${buttons.map((b, i) => `<button type="button" class="btn ${b.cls || ''}" data-mb="${i}">${esc(b.label)}</button>`).join('')}</div>` : ''}</div>`;
+    document.body.appendChild(wrap);
+    let closed = false;
+    const entry = registerModal(() => { if (closed) return; closed = true; wrap.remove(); resolve(null); });
+    const close = async val => {
+      if (closed) return; closed = true; wrap.remove();
+      if (unregisterModal(entry)) await popHistory();
+      resolve(val);
+    };
+    wrap.addEventListener('click', async e => {
+      if (e.target === wrap) return close(null);
+      const b = e.target.closest('[data-mb]'); if (!b) return;
+      const def = buttons[+b.dataset.mb];
+      let val = def.value ?? null;
+      if (def.onClick) { val = await def.onClick(wrap); if (val === KEEP) return; }
+      close(val);
+    });
+    onMount && onMount(wrap, close);
+    setTimeout(() => { const f = wrap.querySelector('[autofocus]'); f && f.focus(); }, 60);
+  });
+}
+const confirmDlg = (msg, okLabel = t('delete'), danger = true, cls = '') => openModal({
+  body: `<p style="margin:0;font-size:15px">${esc(msg)}</p>`, cls,
+  buttons: [{ label: t('cancel'), value: false, cls: 'ghost' }, { label: okLabel, value: true, cls: danger ? 'danger' : 'primary' }]
+}).then(v => !!v);
+const infoModal = (title, msg, cls = '') => openModal({ title, body: `<p style="margin:0;white-space:pre-wrap;color:var(--muted)">${esc(msg)}</p>`, cls, buttons: [{ label: t('ok'), value: true, cls: 'primary' }] });
+
+/* Generic form modal */
+function fieldHtml(f) {
+  const v = f.value ?? '';
+  const lab = `<span>${esc(f.label)}</span>`;
+  const common = `name="${f.name}" ${f.autofocus ? 'autofocus' : ''} placeholder="${esc(f.placeholder || '')}"`;
+  switch (f.type) {
+    case 'textarea': return `<label class="field">${lab}<textarea ${common} rows="${f.rows || 4}">${esc(v)}</textarea></label>`;
+    case 'select': return `<label class="field">${lab}<select name="${f.name}">${f.options.map(([val, l]) => `<option value="${esc(val)}" ${String(val) === String(v) ? 'selected' : ''}>${esc(l)}</option>`).join('')}</select></label>`;
+    case 'seg': return `<div class="field">${lab}<div class="seg" data-seg="${f.name}">${f.options.map(([val, l]) => `<button type="button" class="${String(val) === String(v) ? 'on' : ''}" data-v="${esc(val)}">${esc(l)}</button>`).join('')}</div><input type="hidden" name="${f.name}" value="${esc(v)}"></div>`;
+    case 'image': return `<div class="field">${lab}<label class="img-pick"><img class="img-prev" alt="" ${v ? `src="${v}"` : 'hidden'}><span class="img-ph" ${v ? 'hidden' : ''}>${ic('image', 26, 1.6)}${t('chooseImage')}</span><input type="file" accept="image/*" hidden data-img="${f.name}"></label></div>`;
+    case 'password': return `<div class="field">${lab}<div class="pw-row"><input type="password" ${common} value="${esc(v)}" autocomplete="off" spellcheck="false"><button type="button" class="icon-btn sm" data-pwtoggle title="${t('show')}">${ic('eye', 18)}</button>${f.generate ? `<button type="button" class="icon-btn sm" data-pwgen title="${t('generate')}">${ic('refresh', 18)}</button>` : ''}</div></div>`;
+    default: return `<label class="field">${lab}<input type="${f.type || 'text'}" ${common} value="${esc(v)}" ${f.inputmode ? `inputmode="${f.inputmode}"` : ''} autocomplete="off"></label>`;
+  }
+}
+function formModal({ title, fields, submitLabel = t('save'), deletable = false }) {
+  const imgs = {};
+  fields.filter(f => f.type === 'image').forEach(f => { imgs[f.name] = f.value || ''; });
+  let values = null;
+  const buttons = [];
+  if (deletable) buttons.push({ label: t('delete'), value: 'delete', cls: 'danger-o left' });
+  buttons.push({ label: t('cancel'), value: null, cls: 'ghost' });
+  buttons.push({
+    label: submitLabel, cls: 'primary', onClick: root => {
+      const out = {}; let bad = null;
+      for (const f of fields) {
+        if (f.type === 'image') { out[f.name] = imgs[f.name]; continue; }
+        const el = root.querySelector(`[name="${f.name}"]`);
+        let val = el.value; if (f.type !== 'password' && f.type !== 'textarea') val = val.trim();
+        const invalid = (f.required && !String(val).trim()) || (f.validate && !f.validate(val));
+        el.classList.toggle('invalid', !!invalid);
+        if (invalid && !bad) bad = el;
+        out[f.name] = val;
+      }
+      if (bad) { bad.focus(); return KEEP; }
+      values = out; return 'save';
+    }
+  });
+  return openModal({
+    title, body: `<form class="form" onsubmit="return false">${fields.map(fieldHtml).join('')}</form>`, buttons,
+    onMount: root => {
+      root.addEventListener('click', e => {
+        const sb = e.target.closest('[data-seg] button');
+        if (sb) { const seg = sb.parentElement; $$('button', seg).forEach(b => b.classList.toggle('on', b === sb)); root.querySelector(`input[name="${seg.dataset.seg}"]`).value = sb.dataset.v; }
+        const tg = e.target.closest('[data-pwtoggle]');
+        if (tg) { const i = tg.parentElement.querySelector('input'); i.type = i.type === 'password' ? 'text' : 'password'; }
+        const gn = e.target.closest('[data-pwgen]');
+        if (gn) { const i = gn.parentElement.querySelector('input'); i.value = genPassword(); i.type = 'text'; }
+      });
+      root.addEventListener('change', async e => {
+        const inp = e.target.closest('[data-img]'); if (!inp || !inp.files[0]) return;
+        try {
+          const url = await compressImage(inp.files[0]);
+          imgs[inp.dataset.img] = url;
+          const box = inp.closest('.img-pick'); const img = $('img', box); img.src = url; img.hidden = false; $('.img-ph', box).hidden = true;
+        } catch { toast(t('imageError')); }
+      });
+      root.addEventListener('keydown', e => {
+        if (e.key === 'Enter' && e.target.tagName === 'INPUT') { e.preventDefault(); root.querySelector('.btn.primary').click(); }
+      });
+    }
+  }).then(r => r === 'save' ? values : r === 'delete' ? 'delete' : null);
+}
+
+/* PIN pad */
+function pinPad({ title, subtitle = '', fullscreen = false, cancelable = true, onSubmit, extra = '', onExtra, icon = 'lock' }) {
+  return new Promise(resolve => {
+    const el = document.createElement('div');
+    el.className = 'pin-overlay' + (fullscreen ? ' full' : '');
+    el.innerHTML = `<div class="pin-box"><div class="pin-logo">${ic(icon, 26)}</div><div class="pin-title">${esc(title)}</div><div class="pin-sub">${esc(subtitle)}</div>
+      <div class="pin-dots">${'<i></i>'.repeat(4)}</div><div class="pin-err"></div>
+      <div class="pin-keys">${[1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => `<button type="button" data-k="${n}">${n}</button>`).join('')}
+      ${cancelable ? `<button type="button" data-k="x" class="pk-txt">${t('cancel')}</button>` : '<span></span>'}<button type="button" data-k="0">0</button><button type="button" data-k="b" class="pk-txt" aria-label="Backspace">${ic('backspace', 24, 1.8)}</button></div>
+      ${extra ? `<div class="pin-extra">${extra}</div>` : ''}</div>`;
+    document.body.appendChild(el);
+    let pin = '', busy = false, closed = false, entry = null;
+    const dotsBox = $('.pin-dots', el), dots = $$('i', dotsBox), err = $('.pin-err', el);
+    const upd = () => dots.forEach((d, i) => d.classList.toggle('on', i < pin.length));
+    const finish = async (val, viaPop) => {
+      if (closed) return; closed = true; el.remove(); document.removeEventListener('keydown', onKey);
+      if (entry && unregisterModal(entry) && !viaPop) await popHistory();
+      resolve(val);
+    };
+    if (cancelable) entry = registerModal(() => finish(null, true));
+    const press = async k => {
+      if (busy) return;
+      if (k === 'x') return finish(null);
+      if (k === 'b') { pin = pin.slice(0, -1); upd(); return; }
+      if (pin.length >= 4) return;
+      pin += k; upd(); err.textContent = '';
+      if (pin.length === 4) {
+        busy = true; el.classList.add('busy');
+        let r; try { r = await onSubmit(pin); } catch (e) { console.error(e); r = t('wrongPin'); }
+        el.classList.remove('busy');
+        if (r === true) return finish(pin);
+        err.textContent = r || '';
+        dotsBox.classList.remove('shake'); void dotsBox.offsetWidth; dotsBox.classList.add('shake');
+        navigator.vibrate && navigator.vibrate(150);
+        pin = ''; setTimeout(upd, 200); busy = false;
+      }
+    };
+    el.addEventListener('click', e => {
+      const b = e.target.closest('[data-k]'); if (b) press(b.dataset.k);
+      const x = e.target.closest('[data-extra]'); if (x && onExtra) onExtra(x.dataset.extra);
+    });
+    const onKey = e => {
+      const all = $$('.pin-overlay'); if (all[all.length - 1] !== el || document.querySelector('.modal-wrap.top')) return;
+      if (/^\d$/.test(e.key)) press(e.key);
+      else if (e.key === 'Backspace') press('b');
+      else if (e.key === 'Escape' && cancelable) press('x');
+    };
+    document.addEventListener('keydown', onKey);
+  });
+}
+
+/* Image compression for Brawl Stars screenshots */
+function compressImage(file, max = 1280, q = 0.82) {
+  return new Promise((res, rej) => {
+    const url = URL.createObjectURL(file); const img = new Image();
+    img.onload = () => {
+      const s = Math.min(1, max / Math.max(img.width, img.height));
+      const c = document.createElement('canvas'); c.width = Math.round(img.width * s); c.height = Math.round(img.height * s);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url); res(c.toDataURL('image/jpeg', q));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); rej(new Error('image')); };
+    img.src = url;
+  });
+}
+function genPassword(len = 16) {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%&*?-_+=';
+  const a = crypto.getRandomValues(new Uint32Array(len));
+  return Array.from(a, x => chars[x % chars.length]).join('');
+}
+
+/* Sound, vibration, notifications */
+let AC = null, beepTimer = null;
+function ensureAudio() {
+  try { if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)(); if (AC.state === 'suspended') AC.resume(); } catch { }
+}
+document.addEventListener('pointerdown', ensureAudio, { passive: true });
+function beepOnce() {
+  if (!AC) return;
+  const o = AC.createOscillator(), g = AC.createGain(), n = AC.currentTime;
+  o.type = 'sine'; o.frequency.value = 880;
+  g.gain.setValueAtTime(0.0001, n); g.gain.exponentialRampToValueAtTime(0.4, n + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, n + 0.35);
+  o.connect(g).connect(AC.destination); o.start(n); o.stop(n + 0.4);
+}
+function startBeep() { stopBeep(); let n = 0; beepOnce(); beepTimer = setInterval(() => { beepOnce(); if (++n > 40) stopBeep(); }, 700); }
+function stopBeep() { clearInterval(beepTimer); beepTimer = null; }
+async function notify(title, body) {
+  try {
+    if (!('Notification' in window) || Notification.permission !== 'granted') return;
+    const reg = navigator.serviceWorker && await navigator.serviceWorker.getRegistration();
+    const opts = { body, icon: 'icons/icon-192.png', badge: 'icons/icon-192.png', vibrate: [300, 100, 300], tag: 'ph-' + uid(), requireInteraction: true };
+    if (reg) await reg.showNotification(title, opts); else new Notification(title, opts);
+  } catch (e) { console.warn(e); }
+}
+async function alertRing(title, body) {
+  notify(title, body);
+  startBeep();
+  navigator.vibrate && navigator.vibrate([400, 200, 400, 200, 400]);
+  await infoModal(title, body);
+  stopBeep();
+}
+async function askNotifications() {
+  if (!('Notification' in window)) return toast(t('notifNA'));
+  const p = await Notification.requestPermission();
+  if (p !== 'granted') toast(t('notifDenied'));
+  rerender();
+}
+
+/* ------------------------------ Router ------------------------------ */
+const V = {};   // views
+const A = {};   // click actions
+let CUR_VIEW = null, CUR_ROUTE = { name: '', arg: '' }, timers = [], LOCKED = false;
+function every(ms, fn) { timers.push(setInterval(fn, ms)); }
+function parseHash() {
+  const h = decodeURIComponent(location.hash.replace(/^#\/?/, ''));
+  const i = h.indexOf('/');
+  return i < 0 ? { name: h, arg: '' } : { name: h.slice(0, i), arg: h.slice(i + 1) };
+}
+function go(path) { history.pushState({ d: 1 }, '', '#/' + path); render(); }
+function back() {
+  if (history.state && history.state.d) history.back();
+  else { history.replaceState(null, '', '#/'); render(); }
+}
+async function render() {
+  if (LOCKED) return;
+  const r = parseHash();
+  if (CUR_VIEW && CUR_VIEW.leave) { try { CUR_VIEW.leave(CUR_ROUTE.arg); } catch (e) { console.error(e); } }
+  const view = V[r.name] || V[''];
+  const area = view.vault ? view.vault(r.arg) : null;
+  if (VS && VS.area !== area) { flushVault(); VS = null; }
+  CUR_VIEW = view; CUR_ROUTE = r;
+  if (area && !VS) {
+    timers.forEach(clearInterval); timers = [];
+    $('#app').innerHTML = page(view.title ? view.title() : '', emptyState('lock', ''));
+    const ok = await openVault(area);
+    const now = parseHash();
+    if (now.name !== r.name || now.arg !== r.arg) return;
+    if (!ok) { CUR_VIEW = null; back(); return; }
+  }
+  draw();
+  window.scrollTo(0, 0);
+}
+function draw() {
+  timers.forEach(clearInterval); timers = [];
+  $('#app').innerHTML = CUR_VIEW.html(CUR_ROUTE.arg);
+  CUR_VIEW.mount && CUR_VIEW.mount(CUR_ROUTE.arg);
+}
+function rerender(focusSel) {
+  if (!CUR_VIEW || LOCKED) return;
+  const y = window.scrollY; draw(); window.scrollTo(0, y);
+  if (focusSel) { const el = $(focusSel); el && el.focus(); }
+}
+
+/* Event delegation */
+document.addEventListener('click', e => {
+  const el = e.target.closest('#app [data-act]'); if (!el) return;
+  const fn = A[el.dataset.act]; if (!fn) return;
+  e.preventDefault(); fn(el, e);
+});
+document.addEventListener('input', e => { const el = e.target.closest('#app [data-input]'); if (el && A[el.dataset.input]) A[el.dataset.input](el, e); });
+document.addEventListener('change', e => { const el = e.target.closest('#app [data-change]'); if (el && A[el.dataset.change]) A[el.dataset.change](el, e); });
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  const el = e.target.closest('#app [data-enter]'); if (el && A[el.dataset.enter]) { e.preventDefault(); A[el.dataset.enter](el, e); }
+});
+A.back = () => back();
+A.go = el => go(el.dataset.to);
+
+/* =============================== HOME =============================== */
+const GROUPS = [['g_plan', ['calendar', 'week', 'reminders', 'clock', 'todos', 'checklists']], ['g_private', ['notes', 'secret', 'passwords', 'brawl']], ['g_tools', ['money', 'currency', 'calc', 'settings']]];
+V[''] = {
+  html() {
+    const now = new Date(), td = today(), h = now.getHours();
+    const evToday = S.events.filter(e => e.date === td).length;
+    const openTodos = S.todos.filter(x => !x.done).length;
+    const nextRem = S.reminders.filter(r => !r.done && new Date(r.at) > now).sort((a, b) => new Date(a.at) - new Date(b.at))[0];
+    const ov = (to, mod, label, value) => `<button class="ov" data-act="go" data-to="${to}"><div class="ov-top"><span>${label}</span>${chipIc(mod, 28)}</div>${value}</button>`;
+    return `<div class="home">
+      <div class="home-top"><div><div class="home-date">${fmtDate(now, { weekday: 'long', day: 'numeric', month: 'long' })} · <span id="home-time" class="num">${fmtTime(now)}</span></div>
+        <div class="home-greet">${t(h < 11 ? 'greet_m' : h < 18 ? 'greet_d' : 'greet_e')}</div></div>
+        <div class="home-btns">${iconBtn('lockNow', 'lock', t('lock'))}${iconBtn('go', 'settings', t('m_settings'), 'data-to="settings"')}</div></div>
+      <div class="overview">
+        ${ov('calendar', 'calendar', t('ov_events'), `<div class="ov-v num">${evToday}</div>`)}
+        ${ov('todos', 'todos', t('ov_todos'), `<div class="ov-v num">${openTodos}</div>`)}
+        ${ov('money', 'money', t('ov_balance'), `<div class="ov-v num">${fmtCents(moneyCalc().current)}</div>`)}
+        ${ov('reminders', 'reminders', t('ov_next'), nextRem ? `<div class="ov-v sm">${esc(nextRem.title)}<small>${fmtShortDT(new Date(nextRem.at))}</small></div>` : `<div class="ov-v sm" style="color:var(--muted);font-weight:500">${t('ov_none')}</div>`)}
+      </div>
+      ${GROUPS.map(([g, mods]) => `<h3 class="sec">${t(g)}</h3><div class="tiles">${mods.map(k => `<button class="tile" data-act="go" data-to="${k}">${chipIc(k, 40)}<span class="tile-l">${t('m_' + k)}</span></button>`).join('')}</div>`).join('')}
+      <p class="hint" style="text-align:center;margin-top:28px">PocketHub ${APP_VERSION}</p></div>`;
+  },
+  mount() { every(1000, () => { const el = $('#home-time'); if (el) el.textContent = fmtTime(new Date()); }); }
+};
+A.lockNow = () => lockScreen();
+
+/* ============================= CALENDAR ============================= */
+let CAL = null;
+V.calendar = {
+  title: () => t('m_calendar'),
+  html() {
+    if (!CAL) { const n = new Date(); CAL = { y: n.getFullYear(), m: n.getMonth(), sel: today() }; }
+    const first = new Date(CAL.y, CAL.m, 1), start = startOfWeek(first), td = today();
+    const marked = new Set([...S.events.map(e => e.date), ...S.reminders.filter(r => !r.done).map(r => r.at.slice(0, 10)), ...S.week.map(w => w.date)]);
+    let cells = '';
+    for (let i = 0; i < 7; i++) cells += `<div class="cal-wd">${fmtDate(addDays(start, i), { weekday: 'short' }).replace('.', '')}</div>`;
+    for (let i = 0; i < 42; i++) {
+      const d = addDays(start, i), ds = iso(d);
+      cells += `<button class="cal-cell num ${d.getMonth() !== CAL.m ? 'other' : ''} ${ds === td ? 'today' : ''} ${ds === CAL.sel ? 'sel' : ''}" data-act="calSel" data-d="${ds}"><span>${d.getDate()}</span>${marked.has(ds) ? '<i class="dot"></i>' : ''}</button>`;
+    }
+    const evs = S.events.filter(e => e.date === CAL.sel).sort((a, b) => (a.time || '').localeCompare(b.time || ''));
+    const rems = S.reminders.filter(r => r.at.slice(0, 10) === CAL.sel);
+    const wk = S.week.filter(w => w.date === CAL.sel).sort((a, b) => (a.time || '').localeCompare(b.time || ''));
+    const item = (mod, act, attrs, time, title, sub, done) => `<div class="row bl ${done ? 'done' : ''}" style="--c:${MODS[mod].color}"><div class="row-main" data-act="${act}" ${attrs}><div class="row-title">${time ? `<span class="tm">${time}</span>` : ''}${esc(title)}</div><div class="row-sub">${ic(MODS[mod].icon, 13)}${esc(sub)}</div></div></div>`;
+    let list = evs.map(e => item('calendar', 'evEdit', `data-id="${e.id}"`, e.time, e.title, t('event') + (e.note ? ' · ' + e.note : ''))).join('');
+    list += rems.map(r => item('reminders', 'go', 'data-to="reminders"', r.at.slice(11, 16), r.title, t('reminder'), r.done)).join('');
+    list += wk.map(w => item('week', 'go', 'data-to="week"', w.time, w.text, t('m_week'), w.done)).join('');
+    const body = `<div class="card" style="padding:12px"><div class="cal-head">${iconBtn('calMove', 'chevLeft', '', 'data-n="-1"')}<b>${fmtDate(first, { month: 'long', year: 'numeric' })}</b>${iconBtn('calMove', 'chevRight', '', 'data-n="1"')}</div>
+      <div class="cal-grid">${cells}</div></div>
+      <h3 class="sec day-title">${fmtDate(fromIso(CAL.sel), { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</h3>
+      ${list || `<p class="hint">${t('noItemsDay')}</p>`}`;
+    return page(t('m_calendar'), body, { actions: `<button class="btn sm" data-act="calToday">${t('today')}</button>` }) + fab('evAdd');
+  }
+};
+A.calMove = el => { CAL.m += +el.dataset.n; if (CAL.m < 0) { CAL.m = 11; CAL.y--; } if (CAL.m > 11) { CAL.m = 0; CAL.y++; } rerender(); };
+A.calToday = () => { const n = new Date(); CAL = { y: n.getFullYear(), m: n.getMonth(), sel: today() }; rerender(); };
+A.calSel = el => { CAL.sel = el.dataset.d; const d = fromIso(CAL.sel); CAL.y = d.getFullYear(); CAL.m = d.getMonth(); rerender(); };
+A.evAdd = () => eventForm({ date: CAL.sel });
+A.evEdit = el => eventForm(S.events.find(e => e.id === el.dataset.id));
+async function eventForm(ev) {
+  if (!ev) return;
+  const isNew = !ev.id;
+  const r = await formModal({
+    title: isNew ? t('newEvent') : t('editEvent'), deletable: !isNew, fields: [
+      { name: 'title', label: t('title'), required: true, value: ev.title, autofocus: isNew },
+      { name: 'date', type: 'date', label: t('date'), value: ev.date || today(), required: true },
+      { name: 'time', type: 'time', label: t('timeOpt'), value: ev.time || '' },
+      { name: 'note', type: 'textarea', label: t('note'), value: ev.note || '', rows: 3 },
+    ]
+  });
+  if (!r) return;
+  if (r === 'delete') { if (!await confirmDlg(t('confirmDelete'))) return; S.events = S.events.filter(x => x.id !== ev.id); }
+  else {
+    if (isNew) S.events.push({ id: uid(), ...r }); else Object.assign(ev, r);
+    CAL.sel = r.date; const d = fromIso(r.date); CAL.y = d.getFullYear(); CAL.m = d.getMonth();
+  }
+  save('events'); rerender();
+}
+
+/* =============================== CLOCK =============================== */
+let CLOCKTAB = 'clock';
+const STW = { running: false, startAt: 0, acc: 0, laps: [] };
+const TMR = { total: 300, remaining: 300, running: false, active: false, endAt: 0 };
+const stwElapsed = () => STW.acc + (STW.running ? Date.now() - STW.startAt : 0);
+const tmrRemaining = () => TMR.running ? Math.max(0, (TMR.endAt - Date.now()) / 1000) : TMR.remaining;
+const fmtStw = ms => { const cs = Math.floor(ms / 10) % 100, s = Math.floor(ms / 1000), h = Math.floor(s / 3600); return (h ? h + ':' : '') + pad2(Math.floor(s / 60) % 60) + ':' + pad2(s % 60) + (L() === 'de' ? ',' : '.') + pad2(cs); };
+const CITIES = ['Europe/Berlin', 'Europe/London', 'Europe/Paris', 'Europe/Madrid', 'Europe/Rome', 'Europe/Istanbul', 'Europe/Moscow', 'Europe/Kyiv', 'Europe/Warsaw', 'Africa/Cairo', 'Africa/Johannesburg', 'Asia/Dubai', 'Asia/Kolkata', 'Asia/Bangkok', 'Asia/Shanghai', 'Asia/Hong_Kong', 'Asia/Singapore', 'Asia/Tokyo', 'Asia/Seoul', 'Australia/Sydney', 'Pacific/Auckland', 'America/Sao_Paulo', 'America/New_York', 'America/Chicago', 'America/Denver', 'America/Los_Angeles', 'America/Mexico_City', 'America/Toronto', 'Pacific/Honolulu'];
+const cityName = tz => tz.split('/').pop().replace(/_/g, ' ');
+V.clock = {
+  title: () => t('m_clock'),
+  html() {
+    const tabs = ['clock', 'stopwatch', 'timer'].map(k => `<button class="${CLOCKTAB === k ? 'on' : ''}" data-act="clockTab" data-k="${k}">${t('ct_' + k)}</button>`).join('');
+    let body = `<div class="seg big">${tabs}</div>`;
+    if (CLOCKTAB === 'clock') {
+      body += `<div class="clock-big" id="clk-time"></div><div class="clock-date" id="clk-date"></div>
+        <h3 class="sec">${t('worldClock')}</h3>
+        ${S.settings.worldClocks.map((tz, i) => `<div class="row"><div class="row-main"><div class="row-title">${esc(cityName(tz))}</div><div class="row-sub" data-wcd="${i}"></div></div><div class="wc-time" data-wct="${i}"></div>${iconBtn('wcDel', 'x', t('delete'), `data-i="${i}"`, 'sm')}</div>`).join('')}
+        <button class="btn block" data-act="wcAdd">${ic('plus', 16)}${t('addCity')}</button>`;
+    } else if (CLOCKTAB === 'stopwatch') {
+      const laps = STW.laps.map((l, i, arr) => `<div class="row"><div class="row-main"><div class="row-title">${t('lap')} ${i + 1}</div></div><div class="num">+${fmtStw(l - (arr[i - 1] || 0))}</div><div class="num row-sub" style="margin-left:10px">${fmtStw(l)}</div></div>`).reverse().join('');
+      body += `<div class="clock-big" id="stw-time">${fmtStw(stwElapsed())}</div>
+        <div class="btn-row"><button class="btn big" data-act="${STW.running ? 'stwLap' : 'stwReset'}">${STW.running ? t('lap') : t('reset')}</button>
+        <button class="btn big ${STW.running ? 'danger' : 'primary'}" data-act="stwToggle">${STW.running ? t('pause') : (STW.acc ? t('resume') : t('start'))}</button></div>${laps}`;
+    } else {
+      if (!TMR.active) {
+        const m = Math.floor(TMR.total / 60), s = TMR.total % 60;
+        body += `<div class="tmr-inputs"><input id="tmr-m" type="number" min="0" max="999" inputmode="numeric" value="${m}" aria-label="${t('min')}"><span>:</span><input id="tmr-s" type="number" min="0" max="59" inputmode="numeric" value="${pad2(s)}" aria-label="${t('sec')}"></div>
+          <div class="presets">${[1, 3, 5, 10, 15, 30, 60].map(p => `<button class="btn sm" data-act="tmrPreset" data-m="${p}">${p} ${t('min')}</button>`).join('')}</div>
+          <div class="btn-row"><button class="btn big primary" data-act="tmrStart">${t('start')}</button></div>`;
+      } else {
+        body += `<div class="clock-big" id="tmr-time">${fmtHMS(tmrRemaining())}</div><div class="progress"><i id="tmr-bar" style="width:${100 * tmrRemaining() / TMR.total}%"></i></div>
+          <div class="btn-row"><button class="btn big" data-act="tmrReset">${t('reset')}</button><button class="btn big ${TMR.running ? 'danger' : 'primary'}" data-act="tmrToggle">${TMR.running ? t('pause') : t('resume')}</button></div>`;
+      }
+    }
+    return page(t('m_clock'), body);
+  },
+  mount() {
+    const upd = () => {
+      const now = new Date();
+      const ct = $('#clk-time'); if (ct) { ct.textContent = fmtTime(now, true); $('#clk-date').textContent = fmtDate(now, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }); }
+      S.settings.worldClocks.forEach((tz, i) => {
+        const a = $(`[data-wct="${i}"]`); if (!a) return;
+        try {
+          a.textContent = new Intl.DateTimeFormat(LOC(), { hour: '2-digit', minute: '2-digit', timeZone: tz }).format(now);
+          $(`[data-wcd="${i}"]`).textContent = new Intl.DateTimeFormat(LOC(), { weekday: 'long', day: 'numeric', month: 'short', timeZone: tz }).format(now);
+        } catch { a.textContent = '–'; }
+      });
+      const st = $('#stw-time'); if (st) st.textContent = fmtStw(stwElapsed());
+      const tt = $('#tmr-time'); if (tt) { tt.textContent = fmtHMS(tmrRemaining()); $('#tmr-bar').style.width = (100 * tmrRemaining() / TMR.total) + '%'; }
+    };
+    upd(); every(CLOCKTAB === 'stopwatch' ? 47 : 250, upd);
+  }
+};
+A.clockTab = el => { CLOCKTAB = el.dataset.k; rerender(); };
+A.wcDel = el => { S.settings.worldClocks.splice(+el.dataset.i, 1); save('settings'); rerender(); };
+A.wcAdd = async () => {
+  const r = await formModal({ title: t('addCity'), submitLabel: t('add'), fields: [{ name: 'tz', type: 'select', label: t('chooseCity'), value: 'Europe/Berlin', options: CITIES.map(c => [c, cityName(c)]) }] });
+  if (!r) return; if (!S.settings.worldClocks.includes(r.tz)) S.settings.worldClocks.push(r.tz); save('settings'); rerender();
+};
+A.stwToggle = () => { if (STW.running) { STW.acc += Date.now() - STW.startAt; STW.running = false; } else { STW.startAt = Date.now(); STW.running = true; } rerender(); };
+A.stwLap = () => { STW.laps.push(stwElapsed()); rerender(); };
+A.stwReset = () => { Object.assign(STW, { running: false, acc: 0, laps: [] }); rerender(); };
+A.tmrPreset = el => { $('#tmr-m').value = el.dataset.m; $('#tmr-s').value = '00'; };
+A.tmrStart = () => {
+  const total = (Math.max(0, parseInt($('#tmr-m').value) || 0)) * 60 + Math.min(59, Math.max(0, parseInt($('#tmr-s').value) || 0));
+  if (total <= 0) return toast(t('setTime'));
+  ensureAudio();
+  Object.assign(TMR, { total, remaining: total, running: true, active: true, endAt: Date.now() + total * 1000 });
+  rerender();
+};
+A.tmrToggle = () => {
+  if (TMR.running) { TMR.remaining = tmrRemaining(); TMR.running = false; }
+  else { TMR.endAt = Date.now() + TMR.remaining * 1000; TMR.running = true; }
+  rerender();
+};
+A.tmrReset = () => { Object.assign(TMR, { running: false, active: false, remaining: TMR.total }); rerender(); };
+function tickTimer() {
+  if (TMR.running && Date.now() >= TMR.endAt) {
+    Object.assign(TMR, { running: false, active: false, remaining: TMR.total });
+    if (CUR_VIEW === V.clock) rerender();
+    alertRing(t('timerDone'), fmtHMS(TMR.total));
+  }
+}
+
+/* ============================= REMINDERS ============================= */
+function nextOccurrence(at, repeat) {
+  const d = new Date(at), now = Date.now();
+  let guard = 0;
+  while (d.getTime() <= now && guard++ < 5000) {
+    if (repeat === 'daily') d.setDate(d.getDate() + 1);
+    else if (repeat === 'weekly') d.setDate(d.getDate() + 7);
+    else if (repeat === 'monthly') d.setMonth(d.getMonth() + 1);
+    else break;
+  }
+  return toLocalDT(d);
+}
+function checkReminders() {
+  const now = Date.now(), due = [];
+  for (const r of S.reminders) {
+    if (r.done || r.notified) continue;
+    if (new Date(r.at).getTime() <= now) {
+      due.push(r);
+      if (r.repeat && r.repeat !== 'none') r.at = nextOccurrence(r.at, r.repeat); else r.notified = true;
+    }
+  }
+  if (!due.length) return;
+  save('reminders');
+  if (CUR_VIEW === V.reminders || CUR_VIEW === V['']) rerender();
+  due.forEach(r => notify(r.title, r.note || fmtDateTime(new Date())));
+  alertRing(t('reminder'), due.map(r => '• ' + r.title + (r.note ? '\n  ' + r.note : '')).join('\n'));
+}
+V.reminders = {
+  title: () => t('m_reminders'),
+  html() {
+    const now = Date.now();
+    const list = [...S.reminders].sort((a, b) => new Date(a.at) - new Date(b.at));
+    const overdue = list.filter(r => !r.done && new Date(r.at) <= now);
+    const upcoming = list.filter(r => !r.done && new Date(r.at) > now);
+    const done = list.filter(r => r.done).reverse();
+    const row = r => `<div class="row ${r.done ? 'done' : ''}">${checkBtn(r.done, 'remToggle', r.id)}
+      <div class="row-main" data-act="remEdit" data-id="${r.id}"><div class="row-title">${esc(r.title)}</div><div class="row-sub"><span class="meta">${ic('clock', 13)}${fmtDateTime(new Date(r.at))}</span>${r.repeat && r.repeat !== 'none' ? `<span class="meta">${ic('repeat', 13)}${t('rep_' + r.repeat)}</span>` : ''}${r.note ? `<span>${esc(r.note)}</span>` : ''}</div></div></div>`;
+    const sec = (title, arr, cls = '', icon = '') => arr.length ? `<h3 class="sec ${cls}">${icon ? ic(icon, 14) : ''}${title}</h3>${arr.map(row).join('')}` : '';
+    const perm = ('Notification' in window && Notification.permission !== 'granted') ? `<div class="info">${ic('bell', 18)}<span>${t('notifHint')}</span><button class="btn sm primary" data-act="askNotif">${t('allow')}</button></div>` : '';
+    const body = perm + (list.length ? sec(t('overdue'), overdue, 'warn', 'alert') + sec(t('upcoming'), upcoming) + sec(t('doneSec'), done) : emptyState('bell')) + `<p class="hint">${t('remLimit')}</p>`;
+    return page(t('m_reminders'), body) + fab('remAdd');
+  }
+};
+A.askNotif = () => askNotifications();
+A.remToggle = el => { const r = S.reminders.find(x => x.id === el.dataset.id); r.done = !r.done; if (!r.done && new Date(r.at) > Date.now()) r.notified = false; save('reminders'); rerender(); };
+A.remAdd = () => { const d = new Date(Date.now() + 3600e3); d.setMinutes(0); remForm({ at: toLocalDT(d), repeat: 'none' }); };
+A.remEdit = el => remForm(S.reminders.find(x => x.id === el.dataset.id));
+async function remForm(rem) {
+  if (!rem) return;
+  const isNew = !rem.id;
+  const r = await formModal({
+    title: isNew ? t('newReminder') : t('editReminder'), deletable: !isNew, fields: [
+      { name: 'title', label: t('title'), required: true, value: rem.title, autofocus: isNew },
+      { name: 'at', type: 'datetime-local', label: t('when'), value: rem.at, required: true },
+      { name: 'repeat', type: 'select', label: t('repeat'), value: rem.repeat || 'none', options: ['none', 'daily', 'weekly', 'monthly'].map(k => [k, t('rep_' + k)]) },
+      { name: 'note', type: 'textarea', label: t('note'), value: rem.note || '', rows: 2 },
+    ]
+  });
+  if (!r) return;
+  if (r === 'delete') { if (!await confirmDlg(t('confirmDelete'))) return; S.reminders = S.reminders.filter(x => x.id !== rem.id); }
+  else {
+    const fut = new Date(r.at) > Date.now();
+    if (isNew) S.reminders.push({ id: uid(), done: false, notified: !fut && r.repeat === 'none', ...r });
+    else { Object.assign(rem, r); if (fut) rem.notified = false; }
+    if ('Notification' in window && Notification.permission === 'default') askNotifications();
+  }
+  save('reminders'); rerender();
+}
+
+/* ============================= CHECKLISTS ============================= */
+V.checklists = {
+  title: () => t('m_checklists'),
+  html() {
+    const body = S.checklists.length ? S.checklists.map(c => {
+      const n = c.items.length, d = c.items.filter(i => i.done).length;
+      return `<button class="row" style="width:100%;text-align:left;display:block" data-act="go" data-to="checklist/${c.id}"><div style="display:flex;align-items:center;gap:12px">${chipIc('checklists', 36)}<div class="row-main"><div class="row-title">${esc(c.title)}</div><div class="row-sub num">${d} / ${n} ${t('items')}</div></div>${ic('chevRight', 18)}</div><div class="progress"><i style="width:${n ? 100 * d / n : 0}%;${n && d === n ? 'background:var(--ok)' : ''}"></i></div></button>`;
+    }).join('') : emptyState('listChecks');
+    return page(t('m_checklists'), body) + fab('clNew');
+  }
+};
+A.clNew = async () => {
+  const r = await formModal({ title: t('newChecklist'), fields: [{ name: 'title', label: t('title'), required: true, autofocus: true }] });
+  if (!r) return; const c = { id: uid(), title: r.title, items: [], created: Date.now() }; S.checklists.push(c); save('checklists'); go('checklist/' + c.id);
+};
+const curCl = () => S.checklists.find(c => c.id === CUR_ROUTE.arg);
+V.checklist = {
+  title: () => t('m_checklists'),
+  html(id) {
+    const c = S.checklists.find(x => x.id === id);
+    if (!c) return page(t('m_checklists'), emptyState('info', t('notFound')));
+    const items = [...c.items.filter(i => !i.done), ...c.items.filter(i => i.done)];
+    const body = `<div class="addbar"><input id="cl-new" placeholder="${t('newItem')}" data-enter="clAdd" enterkeyhint="done"><button class="btn primary" data-act="clAdd" aria-label="${t('add')}">${ic('plus', 20)}</button></div>
+      ${items.map(i => `<div class="row ${i.done ? 'done' : ''}">${checkBtn(i.done, 'clToggle', i.id)}<div class="row-main" data-act="clEditItem" data-id="${i.id}"><div class="row-title">${esc(i.text)}</div></div>${iconBtn('clDelItem', 'x', t('delete'), `data-id="${i.id}"`, 'sm')}</div>`).join('')}`;
+    return page(c.title, body, { actions: iconBtn('clRename', 'pencil', t('rename')) + iconBtn('clReset', 'rotate', t('uncheckAll')) + iconBtn('clDel', 'trash', t('delete')) });
+  }
+};
+A.clAdd = () => { const inp = $('#cl-new'), v = inp.value.trim(); if (!v) return inp.focus(); curCl().items.push({ id: uid(), text: v, done: false }); save('checklists'); rerender('#cl-new'); };
+A.clToggle = el => { const i = curCl().items.find(x => x.id === el.dataset.id); i.done = !i.done; save('checklists'); rerender(); };
+A.clDelItem = el => { const c = curCl(); c.items = c.items.filter(x => x.id !== el.dataset.id); save('checklists'); rerender(); };
+A.clEditItem = async el => {
+  const i = curCl().items.find(x => x.id === el.dataset.id);
+  const r = await formModal({ title: t('editItem'), fields: [{ name: 'text', label: t('text'), required: true, value: i.text, autofocus: true }] });
+  if (r) { i.text = r.text; save('checklists'); rerender(); }
+};
+A.clRename = async () => { const c = curCl(); const r = await formModal({ title: t('rename'), fields: [{ name: 'title', label: t('title'), required: true, value: c.title, autofocus: true }] }); if (r) { c.title = r.title; save('checklists'); rerender(); } };
+A.clReset = () => { curCl().items.forEach(i => { i.done = false; }); save('checklists'); rerender(); };
+A.clDel = async () => { if (!await confirmDlg(t('confirmDelete'))) return; S.checklists = S.checklists.filter(c => c.id !== CUR_ROUTE.arg); save('checklists'); back(); };
+
+/* ============================ WEEK PLANNER ============================ */
+let WEEKOFF = 0;
+V.week = {
+  title: () => t('m_week'),
+  html() {
+    const start = addDays(startOfWeek(new Date()), WEEKOFF * 7), end = addDays(start, 6), td = today();
+    let days = '';
+    for (let i = 0; i < 7; i++) {
+      const d = addDays(start, i), ds = iso(d);
+      const entries = S.week.filter(w => w.date === ds).sort((a, b) => (a.time || '99').localeCompare(b.time || '99'));
+      days += `<div class="day-card ${ds === td ? 'today' : ''}"><header><div><b>${fmtDate(d, { weekday: 'long' })}</b><small class="num">${fmtDate(d, { day: '2-digit', month: '2-digit' })}</small></div>${iconBtn('wkAdd', 'plus', t('newEntry'), `data-d="${ds}"`, 'sm')}</header>
+        ${entries.map(w => `<div class="day-entry ${w.done ? 'done' : ''}">${checkBtn(w.done, 'wkToggle', w.id)}<div class="t" data-act="wkEdit" data-id="${w.id}">${w.time ? `<span class="tm">${w.time}</span>` : ''}${esc(w.text)}</div></div>`).join('')}</div>`;
+    }
+    const body = `<div class="week-head">${iconBtn('wkMove', 'chevLeft', '', 'data-n="-1"')}<div><b>${t('weekShort')} ${isoWeek(start)}</b><small class="num">${fmtDate(start, { day: '2-digit', month: '2-digit' })} – ${fmtDate(end, { day: '2-digit', month: '2-digit', year: 'numeric' })}</small></div>${iconBtn('wkMove', 'chevRight', '', 'data-n="1"')}</div>${days}`;
+    return page(t('m_week'), body, { actions: WEEKOFF ? `<button class="btn sm" data-act="wkMove" data-n="0">${t('thisWeek')}</button>` : '' });
+  }
+};
+A.wkMove = el => { const n = +el.dataset.n; WEEKOFF = n === 0 ? 0 : WEEKOFF + n; rerender(); };
+A.wkToggle = el => { const w = S.week.find(x => x.id === el.dataset.id); w.done = !w.done; save('week'); rerender(); };
+A.wkAdd = el => wkForm({ date: el.dataset.d });
+A.wkEdit = el => wkForm(S.week.find(x => x.id === el.dataset.id));
+async function wkForm(w) {
+  if (!w) return;
+  const isNew = !w.id;
+  const r = await formModal({
+    title: (isNew ? t('newEntry') : t('editEntry')) + ' · ' + fmtDate(fromIso(w.date), { weekday: 'short', day: '2-digit', month: '2-digit' }), deletable: !isNew, fields: [
+      { name: 'text', label: t('text'), required: true, value: w.text, autofocus: isNew },
+      { name: 'time', type: 'time', label: t('timeOpt'), value: w.time || '' },
+      { name: 'date', type: 'date', label: t('date'), value: w.date, required: true },
+    ]
+  });
+  if (!r) return;
+  if (r === 'delete') { if (!await confirmDlg(t('confirmDelete'))) return; S.week = S.week.filter(x => x.id !== w.id); }
+  else if (isNew) S.week.push({ id: uid(), done: false, ...r }); else Object.assign(w, r);
+  save('week'); rerender();
+}
+
+/* =============================== TODOS =============================== */
+let TODOF = 'open';
+const PRI = { high: 0, normal: 1, low: 2 };
+V.todos = {
+  title: () => t('m_todos'),
+  html() {
+    let list = S.todos.filter(x => TODOF === 'all' || (TODOF === 'done' ? x.done : !x.done));
+    list.sort((a, b) => (a.done - b.done) || (PRI[a.priority] - PRI[b.priority]) || ((a.due || '9999').localeCompare(b.due || '9999')) || (a.created - b.created));
+    const td = today();
+    const rows = list.map(x => {
+      const sub = (x.priority !== 'normal' ? `<span class="badge ${x.priority}">${t('pr_' + x.priority)}</span>` : '') + (x.due ? `<span class="meta ${!x.done && x.due < td ? 'warn' : ''}">${ic('calendar', 13)}${fmtDate(fromIso(x.due))}</span>` : '') + (x.note ? `<span>${esc(x.note)}</span>` : '');
+      return `<div class="row ${x.done ? 'done' : ''}">${checkBtn(x.done, 'tdToggle', x.id)}<div class="row-main" data-act="tdEdit" data-id="${x.id}"><div class="row-title">${esc(x.text)}</div>${sub ? `<div class="row-sub">${sub}</div>` : ''}</div></div>`;
+    }).join('');
+    const seg = ['open', 'done', 'all'].map(k => `<button class="${TODOF === k ? 'on' : ''}" data-act="tdFilter" data-k="${k}">${t('f_' + k)} · ${k === 'all' ? S.todos.length : S.todos.filter(x => k === 'done' ? x.done : !x.done).length}</button>`).join('');
+    const body = `<div class="addbar"><input id="td-new" placeholder="${t('newTodo')}" data-enter="tdAdd" enterkeyhint="done"><button class="btn primary" data-act="tdAdd" aria-label="${t('add')}">${ic('plus', 20)}</button></div>
+      <div class="seg big">${seg}</div>${rows || emptyState('squareCheck', '')}
+      ${TODOF !== 'open' && S.todos.some(x => x.done) ? `<button class="btn block" data-act="tdClear">${ic('trash', 16)}${t('clearDone')}</button>` : ''}`;
+    return page(t('m_todos'), body);
+  }
+};
+A.tdAdd = () => { const inp = $('#td-new'), v = inp.value.trim(); if (!v) return inp.focus(); S.todos.push({ id: uid(), text: v, done: false, priority: 'normal', due: '', note: '', created: Date.now() }); save('todos'); if (TODOF === 'done') TODOF = 'open'; rerender('#td-new'); };
+A.tdToggle = el => { const x = S.todos.find(i => i.id === el.dataset.id); x.done = !x.done; save('todos'); rerender(); };
+A.tdFilter = el => { TODOF = el.dataset.k; rerender(); };
+A.tdClear = async () => { if (!await confirmDlg(t('clearDone') + '?')) return; S.todos = S.todos.filter(x => !x.done); save('todos'); rerender(); };
+A.tdEdit = async el => {
+  const x = S.todos.find(i => i.id === el.dataset.id);
+  const r = await formModal({
+    title: t('editTodo'), deletable: true, fields: [
+      { name: 'text', label: t('text'), required: true, value: x.text },
+      { name: 'priority', type: 'seg', label: t('priority'), value: x.priority, options: ['high', 'normal', 'low'].map(k => [k, t('pr_' + k)]) },
+      { name: 'due', type: 'date', label: t('dueOpt'), value: x.due },
+      { name: 'note', type: 'textarea', label: t('note'), value: x.note, rows: 2 },
+    ]
+  });
+  if (!r) return;
+  if (r === 'delete') { if (!await confirmDlg(t('confirmDelete'))) return; S.todos = S.todos.filter(i => i.id !== x.id); }
+  else Object.assign(x, r);
+  save('todos'); rerender();
+};
+
+/* ======================== NOTES & SECRET NOTES ======================== */
+function makeNotes(secret) {
+  const listName = secret ? 'secret' : 'notes', editName = secret ? 'secretnote' : 'note';
+  const st = () => secret ? (VS ? VS.data.notes : []) : S.notes;
+  const persist = now => secret ? (now ? saveVaultNow() : saveVaultSoon()) : (now ? (clearTimeout(saveTimers.notes), delete saveTimers.notes, save('notes')) : saveSoon('notes'));
+  const vault = secret ? () => 'secret' : undefined;
+  const title = () => secret ? t('m_secret') : t('m_notes');
+  let query = '';
+  const listHtml = () => {
+    const q = query.toLowerCase();
+    const arr = st().filter(n => !q || (n.title + ' ' + n.body).toLowerCase().includes(q)).sort((a, b) => b.updated - a.updated);
+    return arr.length ? arr.map(n => `<button class="note-card" data-act="go" data-to="${editName}/${n.id}"><div class="note-t">${esc(n.title || t('untitled'))}</div><div class="note-b">${esc(n.body.slice(0, 200))}</div><div class="note-d">${fmtDateTime(new Date(n.updated))}</div></button>`).join('') : emptyState(secret ? 'lock' : 'fileText');
+  };
+  V[listName] = {
+    vault, title,
+    html() {
+      return page(title(), `${secret ? `<div class="info">${ic('shield', 18)}<span>${t('secretInfo')}</span></div>` : ''}${searchBox(query, `data-input="noteSearch" data-l="${listName}"`)}<div id="notes-list" class="notes-grid">${listHtml()}</div>`) + fab('noteNew', `data-r="${editName}"`);
+    },
+    search(v) { query = v; $('#notes-list').innerHTML = listHtml(); }
+  };
+  V[editName] = {
+    vault, title,
+    create() { const n = { id: uid(), title: '', body: '', created: Date.now(), updated: Date.now() }; st().push(n); go(editName + '/' + n.id); },
+    html(id) {
+      const n = st().find(x => x.id === id);
+      if (!n) return page(title(), emptyState('info', t('notFound')));
+      return page(title(), `<input class="note-title-in" placeholder="${t('title')}" value="${esc(n.title)}" data-input="noteEdit" data-f="title" data-r="${editName}"><textarea class="note-body-in" placeholder="${t('noteBody')}" data-input="noteEdit" data-f="body" data-r="${editName}">${esc(n.body)}</textarea>`,
+        { actions: iconBtn('noteDel', 'trash', t('delete'), `data-r="${editName}"`) });
+    },
+    mount(id) {
+      const n = st().find(x => x.id === id); if (!n) return;
+      const ta = $('.note-body-in'); const fit = () => { ta.style.height = 'auto'; ta.style.height = Math.max(ta.scrollHeight, window.innerHeight - 200) + 'px'; }; fit(); ta.addEventListener('input', fit);
+      if (!n.title && !n.body) $('.note-title-in').focus();
+    },
+    edit(id, f, v) { const n = st().find(x => x.id === id); if (!n) return; n[f] = v; n.updated = Date.now(); persist(false); },
+    leave(id) {
+      const arr = st(), i = arr.findIndex(x => x.id === id);
+      if (i >= 0 && !arr[i].title.trim() && !arr[i].body.trim()) arr.splice(i, 1);
+      persist(true);
+    },
+    async del(id) {
+      if (!await confirmDlg(t('confirmDelete'))) return;
+      const arr = st(), i = arr.findIndex(x => x.id === id); if (i >= 0) arr.splice(i, 1);
+      persist(true); back();
+    }
+  };
+}
+makeNotes(false); makeNotes(true);
+A.noteSearch = el => V[el.dataset.l].search(el.value);
+A.noteNew = el => V[el.dataset.r].create();
+A.noteEdit = el => V[el.dataset.r].edit(CUR_ROUTE.arg, el.dataset.f, el.value);
+A.noteDel = el => V[el.dataset.r].del(CUR_ROUTE.arg);
+
+/* ============================= PASSWORDS ============================= */
+let PWQ = '';
+const pwListHtml = () => {
+  const q = PWQ.toLowerCase();
+  const arr = VS.data.passwords.filter(p => !q || (p.site + ' ' + p.user + ' ' + (p.url || '')).toLowerCase().includes(q)).sort((a, b) => a.site.localeCompare(b.site));
+  return arr.length ? arr.map(p => `<div class="row"><div class="avatar" style="--c:${avatarColor(p.site)}">${esc((p.site || '?').trim().charAt(0).toUpperCase())}</div><div class="row-main" data-act="pwOpen" data-id="${p.id}"><div class="row-title">${esc(p.site)}</div><div class="row-sub">${esc(p.user || '—')}</div></div>${iconBtn('pwCopy', 'copy', t('copy'), `data-id="${p.id}"`, 'sm')}</div>`).join('') : emptyState('key');
+};
+V.passwords = {
+  vault: () => 'passwords', title: () => t('m_passwords'),
+  html() { return page(t('m_passwords'), `<div class="info">${ic('shield', 18)}<span>${t('secretInfo')}</span></div>${searchBox(PWQ, 'data-input="pwSearch"')}<div id="pw-list">${pwListHtml()}</div>`) + fab('pwAdd'); }
+};
+A.pwSearch = el => { PWQ = el.value; $('#pw-list').innerHTML = pwListHtml(); };
+A.pwCopy = el => { const p = VS.data.passwords.find(x => x.id === el.dataset.id); if (p) copyText(p.pass || ''); };
+A.pwAdd = () => pwForm({});
+A.pwOpen = async el => {
+  const p = VS.data.passwords.find(x => x.id === el.dataset.id); if (!p) return;
+  const kv = (label, val, key, secretVal) => val ? `<div class="kv"><span>${esc(label)}</span><b class="${secretVal ? 'mono' : ''}" ${secretVal ? 'data-hidden="1"' : ''}>${secretVal ? '••••••••' : esc(val)}</b>${secretVal ? `<button class="icon-btn sm" data-reveal title="${t('show')}">${ic('eye', 18)}</button>` : ''}${key ? `<button class="icon-btn sm" data-copy="${key}" title="${t('copy')}">${ic('copy', 18)}</button>` : ''}</div>` : '';
+  const r = await openModal({
+    title: p.site,
+    body: kv(t('username'), p.user, 'user') + kv(t('password'), p.pass, 'pass', true) + kv(t('url'), p.url, 'url') + kv(t('note'), p.note),
+    buttons: [{ label: t('delete'), value: 'delete', cls: 'danger-o left' }, { label: t('edit'), value: 'edit' }, { label: t('close'), value: null, cls: 'primary' }],
+    onMount: root => root.addEventListener('click', e => {
+      const c = e.target.closest('[data-copy]'); if (c) copyText(p[c.dataset.copy] || '');
+      const rv = e.target.closest('[data-reveal]');
+      if (rv) { const b = rv.previousElementSibling; const hidden = b.dataset.hidden === '1'; b.textContent = hidden ? p.pass : '••••••••'; b.dataset.hidden = hidden ? '0' : '1'; }
+    })
+  });
+  if (r === 'edit') pwForm(p);
+  else if (r === 'delete' && await confirmDlg(t('confirmDelete'))) { VS.data.passwords = VS.data.passwords.filter(x => x.id !== p.id); await saveVaultNow(); rerender(); }
+};
+async function pwForm(p) {
+  const isNew = !p.id;
+  const r = await formModal({
+    title: isNew ? t('newPassword') : t('editPassword'), fields: [
+      { name: 'site', label: t('site'), required: true, value: p.site, autofocus: isNew },
+      { name: 'user', label: t('username'), value: p.user },
+      { name: 'pass', type: 'password', label: t('password'), value: p.pass, generate: true },
+      { name: 'url', label: t('url'), value: p.url, type: 'url' },
+      { name: 'note', type: 'textarea', label: t('note'), value: p.note, rows: 2 },
+    ]
+  });
+  if (!r || !VS) return;
+  if (isNew) VS.data.passwords.push({ id: uid(), ...r, updated: Date.now() }); else Object.assign(p, r, { updated: Date.now() });
+  await saveVaultNow(); rerender();
+}
+
+/* ============================= CALCULATOR ============================= */
+let CALC = '';
+function calcEval(expr) {
+  const s = expr.replace(/×/g, '*').replace(/÷/g, '/').replace(/−/g, '-').replace(/,/g, '.');
+  let i = 0, lastPct = false, termPct = false;
+  const ws = () => { while (s[i] === ' ') i++; };
+  // "a + b%" means a plus b percent of a (like phone calculators); "b%" alone is b/100
+  function pExpr() {
+    let v = pTerm();
+    for (; ;) {
+      ws();
+      if (s[i] === '+') { i++; const x = pTerm(); v += termPct ? v * x : x; }
+      else if (s[i] === '-') { i++; const x = pTerm(); v -= termPct ? v * x : x; }
+      else return v;
+    }
+  }
+  function pTerm() { let v = pFactor(); termPct = lastPct; for (; ;) { ws(); if (s[i] === '*') { i++; v *= pFactor(); termPct = false; } else if (s[i] === '/') { i++; v /= pFactor(); termPct = false; } else return v; } }
+  function pFactor() { ws(); if (s[i] === '-') { i++; return -pFactor(); } if (s[i] === '+') { i++; return pFactor(); } return pPost(); }
+  function pPost() { let v = pPrim(); lastPct = false; for (; ;) { ws(); if (s[i] === '%') { i++; v /= 100; lastPct = true; } else return v; } }
+  function pPrim() {
+    ws();
+    if (s[i] === '(') { i++; const v = pExpr(); ws(); if (s[i] === ')') i++; return v; }
+    const m = /^(\d+\.?\d*|\.\d+)(e[+-]?\d+)?/i.exec(s.slice(i));
+    if (!m) throw new Error('syntax');
+    i += m[0].length; return parseFloat(m[0]);
+  }
+  if (!s.trim()) throw new Error('empty');
+  const v = pExpr(); ws();
+  if (i < s.length) throw new Error('syntax');
+  if (!isFinite(v)) throw new Error('math');
+  return Number(v.toPrecision(12));
+}
+const calcShow = s => L() === 'de' ? s.replace(/\./g, ',') : s;
+const CALC_KEYS = [['C', 'fn'], ['⌫', 'fn'], ['%', 'op'], ['÷', 'op'], ['7'], ['8'], ['9'], ['×', 'op'], ['4'], ['5'], ['6'], ['−', 'op'], ['1'], ['2'], ['3'], ['+', 'op'], ['('], ['0'], ['.'], [')'], ['=', 'eq']];
+V.calc = {
+  title: () => t('m_calc'),
+  html() {
+    const hist = S.calcHistory.slice().reverse().map((h, i) => `<div class="row"><div class="row-main num" data-act="calcHist" data-i="${S.calcHistory.length - 1 - i}"><div class="row-sub">${esc(calcShow(h.e))} =</div><div class="row-title">${esc(calcShow(h.r))}</div></div></div>`).join('');
+    const label = k => k === '⌫' ? ic('backspace', 22, 1.8) : k === '.' ? (L() === 'de' ? ',' : '.') : k;
+    const body = `<div class="calc-display"><div class="calc-expr" id="calc-expr">${esc(calcShow(CALC)) || '0'}</div><div class="calc-prev" id="calc-prev"></div></div>
+      <div class="calc-keys">${CALC_KEYS.map(([k, c]) => `<button class="${c || ''}" data-act="calcKey" data-k="${k}">${label(k)}</button>`).join('')}</div>
+      ${hist ? `<h3 class="sec">${t('history')}</h3>${hist}<button class="btn block" data-act="calcClearHist">${t('clearHistory')}</button>` : ''}`;
+    return page(t('m_calc'), body);
+  },
+  mount() { calcUpdate(); }
+};
+function calcUpdate() {
+  const e = $('#calc-expr'); if (!e) return;
+  e.textContent = calcShow(CALC) || '0';
+  let prev = '';
+  if (/[+\-−×÷*/%(]/.test(CALC.replace(/^-/, ''))) { try { prev = '= ' + calcShow(String(calcEval(CALC))); } catch { } }
+  $('#calc-prev').textContent = prev;
+}
+A.calcKey = el => {
+  const k = el.dataset.k;
+  if (k === 'C') CALC = '';
+  else if (k === '⌫') CALC = CALC.slice(0, -1);
+  else if (k === '=') {
+    try {
+      const r = String(calcEval(CALC));
+      S.calcHistory.push({ e: CALC, r }); if (S.calcHistory.length > 30) S.calcHistory.shift(); save('calcHistory');
+      CALC = r; rerender(); return;
+    } catch { $('#calc-prev').textContent = t('calcError'); navigator.vibrate && navigator.vibrate(80); return; }
+  } else {
+    const ops = '+−×÷';
+    if (ops.includes(k) && ops.includes(CALC.slice(-1))) CALC = CALC.slice(0, -1) + k;
+    else if (k === '.') { const last = CALC.split(/[+−×÷()%]/).pop(); if (!last.includes('.')) CALC += last ? '.' : '0.'; }
+    else CALC += k;
+  }
+  calcUpdate();
+};
+A.calcHist = el => { CALC = S.calcHistory[+el.dataset.i].r; window.scrollTo(0, 0); calcUpdate(); };
+A.calcClearHist = () => { S.calcHistory = []; save('calcHistory'); rerender(); };
+
+/* ============================ VIRTUAL MONEY ============================ */
+function moneyCalc() {
+  const e = S.money.entries;
+  const done = e.filter(x => x.done).reduce((s, x) => s + x.amount, 0);
+  const planned = e.filter(x => !x.done).reduce((s, x) => s + x.amount, 0);
+  return { current: S.money.start + done, planned, projected: S.money.start + done + planned };
+}
+V.money = {
+  title: () => t('m_money'),
+  html() {
+    const m = moneyCalc(), td = today();
+    const planned = S.money.entries.filter(e => !e.done).sort((a, b) => a.date.localeCompare(b.date));
+    const done = S.money.entries.filter(e => e.done).sort((a, b) => b.date.localeCompare(a.date));
+    const row = (e, after) => `<div class="row">${checkBtn(e.done, 'mnToggle', e.id)}
+      <div class="row-main" data-act="mnEdit" data-id="${e.id}"><div class="row-title">${esc(e.title)}</div><div class="row-sub"><span class="num">${fmtDate(fromIso(e.date))}</span>${!e.done && e.date < td ? `<span class="warn">${t('due')}</span>` : ''}${after != null ? `<span>${t('mnAfter')} <b class="num" style="color:var(--text);font-weight:600">${fmtCents(after)}</b></span>` : ''}</div></div>
+      <div class="amt ${e.amount < 0 ? 'neg' : 'pos'}">${fmtSigned(e.amount)}</div></div>`;
+    let run = m.current;
+    const plRows = planned.map(e => { run += e.amount; return row(e, run); }).join('');
+    const body = `<div class="money-hero"><button class="mh-cur" data-act="mnSetBal"><span>${t('mnCurrent')}</span><b>${fmtCents(m.current)}</b><span class="mh-edit">${ic('pencil', 12)}${t('mnAdjust')}</span></button>
+      <div class="mh-grid"><div><span>${t('mnPlanned')}</span><b>${fmtSigned(m.planned)}</b></div><div><span>${t('mnProjected')}</span><b class="${m.projected < 0 ? 'neg' : ''}">${fmtCents(m.projected)}</b></div></div></div>
+      ${planned.length ? `<h3 class="sec">${t('mnPlannedList')}</h3>${plRows}` : `<p class="hint">${t('mnHint')}</p>`}
+      ${done.length ? `<h3 class="sec">${t('mnDoneList')}</h3>${done.map(e => row(e)).join('')}` : ''}`;
+    return page(t('m_money'), body) + fab('mnAdd');
+  }
+};
+A.mnSetBal = async () => {
+  const m = moneyCalc();
+  const r = await formModal({ title: t('setBalance'), fields: [{ name: 'v', label: t('balance'), value: (m.current / 100).toFixed(2).replace('.', L() === 'de' ? ',' : '.'), inputmode: 'decimal', required: true, autofocus: true, validate: v => !isNaN(parseAmount(v)) }] });
+  if (!r) return; S.money.start += parseAmount(r.v) - m.current; save('money'); rerender();
+};
+A.mnToggle = el => { const e = S.money.entries.find(x => x.id === el.dataset.id); e.done = !e.done; save('money'); rerender(); };
+A.mnAdd = () => mnForm({ amount: 0, date: today(), done: false });
+A.mnEdit = el => mnForm(S.money.entries.find(x => x.id === el.dataset.id));
+async function mnForm(e) {
+  if (!e) return;
+  const isNew = !e.id;
+  const r = await formModal({
+    title: isNew ? t('newMoney') : t('editMoney'), deletable: !isNew, fields: [
+      { name: 'kind', type: 'seg', label: t('kind'), value: e.amount > 0 || isNew ? 'in' : 'out', options: [['in', t('income')], ['out', t('expense')]] },
+      { name: 'title', label: t('title'), required: true, value: e.title, autofocus: isNew },
+      { name: 'amount', label: t('amount'), inputmode: 'decimal', required: true, value: isNew ? '' : (Math.abs(e.amount) / 100).toFixed(2).replace('.', L() === 'de' ? ',' : '.'), validate: v => parseAmount(v) > 0 },
+      { name: 'date', type: 'date', label: t('date'), value: e.date, required: true },
+      { name: 'status', type: 'seg', label: t('status'), value: e.done ? 'done' : 'planned', options: [['planned', t('st_planned')], ['done', t('st_done')]] },
+    ]
+  });
+  if (!r) return;
+  if (r === 'delete') { if (!await confirmDlg(t('confirmDelete'))) return; S.money.entries = S.money.entries.filter(x => x.id !== e.id); }
+  else {
+    const amt = Math.abs(parseAmount(r.amount)) * (r.kind === 'out' ? -1 : 1);
+    const data = { title: r.title, amount: amt, date: r.date, done: r.status === 'done' };
+    if (isNew) S.money.entries.push({ id: uid(), ...data }); else Object.assign(e, data);
+  }
+  save('money'); rerender();
+}
+
+/* ============================== CURRENCY ============================== */
+const CURS = ['USD', 'GBP', 'CHF', 'JPY', 'PLN', 'CZK', 'HUF', 'SEK', 'NOK', 'DKK', 'ISK', 'TRY', 'RON', 'AUD', 'CAD', 'NZD', 'CNY', 'HKD', 'SGD', 'KRW', 'INR', 'IDR', 'MYR', 'PHP', 'THB', 'ILS', 'BRL', 'MXN', 'ZAR'];
+const FALLBACK_RATES = { USD: 1.16, GBP: 0.88, CHF: 0.93, JPY: 178, PLN: 4.24, CZK: 24.2, HUF: 385, SEK: 10.9, NOK: 11.7, DKK: 7.47, ISK: 146, TRY: 49, RON: 5.09, AUD: 1.77, CAD: 1.63, NZD: 2.03, CNY: 8.25, HKD: 9.0, SGD: 1.51, KRW: 1680, INR: 103, IDR: 19300, MYR: 4.85, PHP: 68, THB: 37.5, ILS: 3.8, BRL: 6.2, MXN: 21.3, ZAR: 20 };
+const getRates = () => (S.rates && S.rates.rates) || FALLBACK_RATES;
+let curNames = null;
+function curName(c) { try { curNames = curNames && curNames.lang === L() ? curNames : { lang: L(), dn: new Intl.DisplayNames([LOC()], { type: 'currency' }) }; return curNames.dn.of(c); } catch { return c; } }
+const fmtCur = (v, c) => { try { return new Intl.NumberFormat(LOC(), { style: 'currency', currency: c, maximumFractionDigits: v !== 0 && Math.abs(v) < 1 ? 4 : 2 }).format(v); } catch { return v.toFixed(2) + ' ' + c; } };
+async function fetchRates(force) {
+  if (!force && S.rates && Date.now() - S.rates.fetched < 6 * 3600e3) return;
+  for (const url of ['https://api.frankfurter.dev/v1/latest?base=EUR', 'https://api.frankfurter.app/latest?from=EUR']) {
+    try {
+      const res = await fetch(url, { cache: 'no-store' });
+      if (!res.ok) continue;
+      const j = await res.json();
+      if (!j.rates || !j.rates.USD) continue;
+      S.rates = { date: j.date, rates: j.rates, fetched: Date.now() }; save('rates');
+      if (CUR_VIEW === V.currency) curUpdate();
+      if (force) toast(t('ratesOk'));
+      return;
+    } catch { }
+  }
+  if (force) toast(t('ratesFail'));
+}
+V.currency = {
+  title: () => t('m_currency'),
+  html() {
+    const c = S.settings.cur, rates = getRates();
+    const sel = `<select data-change="curCode" aria-label="currency">${CURS.filter(x => rates[x]).map(x => `<option value="${x}" ${x === c.code ? 'selected' : ''}>${x} – ${esc(curName(x))}</option>`).join('')}</select>`;
+    const eur = `<div class="cur-fixed">EUR €</div>`;
+    const body = `<div class="card">
+        <div class="cur-row"><input id="cur-amt" inputmode="decimal" value="${esc(c.amt)}" data-input="curAmt" aria-label="amount">${c.dir === 'from' ? eur : sel}</div>
+        <button class="swap" data-act="curSwap" aria-label="swap">${ic('swap', 18)}</button>
+        <div class="cur-row"><div class="cur-res" id="cur-res"></div>${c.dir === 'from' ? sel : eur}</div>
+      </div>
+      <p class="hint" id="cur-info"></p><button class="btn sm" data-act="curRefresh">${ic('refresh', 14)}${t('refresh')}</button>
+      <h3 class="sec">${t('allCurrencies')}</h3><div id="cur-all"></div>`;
+    return page(t('m_currency'), body);
+  },
+  mount() { curUpdate(); fetchRates(false); }
+};
+function curUpdate() {
+  const c = S.settings.cur, rates = getRates();
+  const amt = parseAmount(c.amt) / 100;
+  const ok = !isNaN(amt), rate = rates[c.code];
+  const res = $('#cur-res'); if (!res) return;
+  if (!rate || !ok) res.textContent = '–';
+  else res.textContent = c.dir === 'from' ? fmtCur(amt * rate, c.code) : fmtCur(amt / rate, 'EUR');
+  $('#cur-info').textContent = (S.rates ? t('ratesFrom', fmtDate(fromIso(S.rates.date))) : t('ratesOffline')) + (rate ? ` · 1 € = ${fmtCur(rate, c.code)}` : '');
+  $('#cur-all').innerHTML = !ok ? '' : CURS.filter(x => rates[x]).map(x => `<div class="row"><div class="avatar" style="--c:${avatarColor(x)};font-size:12px">${x}</div><div class="row-main"><div class="row-title">${esc(curName(x))}</div></div><div class="amt">${c.dir === 'from' ? fmtCur(amt * rates[x], x) : fmtCur(amt / rates[x], 'EUR')}</div></div>`).join('');
+}
+A.curAmt = el => { S.settings.cur.amt = el.value; saveSoon('settings'); curUpdate(); };
+A.curCode = el => { S.settings.cur.code = el.value; save('settings'); curUpdate(); };
+A.curSwap = () => { const c = S.settings.cur; c.dir = c.dir === 'from' ? 'to' : 'from'; save('settings'); rerender(); };
+A.curRefresh = () => fetchRates(true);
+
+/* ========================== BRAWL STARS ACCOUNTS ========================== */
+let BSREVEAL = false;
+V.brawl = {
+  title: () => t('m_brawl'),
+  html() {
+    const body = S.brawl.length ? `<div class="bs-grid">${S.brawl.map(b => `<button class="bs-card" data-act="go" data-to="brawlitem/${b.id}">${b.img ? `<img src="${b.img}" alt="" loading="lazy">` : `<div class="bs-ph">${ic('gamepad', 34, 1.5)}</div>`}<div class="bs-title"><span>${esc(b.title)}</span>${ic('lock', 14)}</div></button>`).join('')}</div>` : emptyState('gamepad');
+    return page(t('m_brawl'), `<div class="info">${ic('lock', 18)}<span>${t('brawlHint')}</span></div>${body}`) + fab('bsAdd');
+  }
+};
+A.bsAdd = async () => {
+  const r = await formModal({ title: t('newAccount'), fields: [{ name: 'title', label: t('title'), required: true, autofocus: true }, { name: 'img', type: 'image', label: t('image') }] });
+  if (!r) return; S.brawl.push({ id: uid(), title: r.title, img: r.img, created: Date.now() }); save('brawl'); rerender();
+};
+V.brawlitem = {
+  vault: id => 'brawl:' + id, title: () => t('m_brawl'),
+  html(id) {
+    const b = S.brawl.find(x => x.id === id);
+    if (!b) return page(t('m_brawl'), emptyState('info', t('notFound')));
+    const d = VS.data.brawl[id] || {};
+    const kv = (label, val, key, secretVal) => val ? `<div class="kv"><span>${esc(label)}</span><b class="${secretVal ? 'mono' : ''}">${secretVal && !BSREVEAL ? '••••••••' : esc(val)}</b>${secretVal ? `<button class="icon-btn sm" data-act="bsReveal" title="${t('show')}">${ic('eye', 18)}</button>` : ''}${key ? `<button class="icon-btn sm" data-act="bsCopy" data-k="${key}" title="${t('copy')}">${ic('copy', 18)}</button>` : ''}</div>` : '';
+    const details = kv(t('playerTag'), d.tag, 'tag') + kv(t('trophies'), d.trophies) + kv(t('login'), d.login, 'login') + kv(t('password'), d.pass, 'pass', true) + kv(t('notes'), d.notes);
+    return page(b.title, `${b.img ? `<img class="bs-hero" src="${b.img}" alt="">` : ''}<div class="card">${details || `<p class="hint" style="margin:0">${t('noDetails')}</p>`}</div>`,
+      { actions: iconBtn('bsEdit', 'pencil', t('edit')) + iconBtn('bsDel', 'trash', t('delete')) });
+  },
+  leave() { BSREVEAL = false; }
+};
+A.bsReveal = () => { BSREVEAL = !BSREVEAL; rerender(); };
+A.bsCopy = el => { const d = VS.data.brawl[CUR_ROUTE.arg] || {}; copyText(d[el.dataset.k] || ''); };
+A.bsEdit = async () => {
+  const id = CUR_ROUTE.arg, b = S.brawl.find(x => x.id === id), d = VS.data.brawl[id] || {};
+  const r = await formModal({
+    title: t('editAccount'), fields: [
+      { name: 'title', label: t('title'), required: true, value: b.title },
+      { name: 'img', type: 'image', label: t('image'), value: b.img },
+      { name: 'tag', label: t('playerTag'), value: d.tag, placeholder: '#ABC123' },
+      { name: 'trophies', label: t('trophies'), value: d.trophies, inputmode: 'numeric' },
+      { name: 'login', label: t('login'), value: d.login },
+      { name: 'pass', type: 'password', label: t('password'), value: d.pass, generate: true },
+      { name: 'notes', type: 'textarea', label: t('notes'), value: d.notes, rows: 3 },
+    ]
+  });
+  if (!r || !VS) return;
+  b.title = r.title; b.img = r.img; save('brawl');
+  VS.data.brawl[id] = { tag: r.tag, trophies: r.trophies, login: r.login, pass: r.pass, notes: r.notes };
+  await saveVaultNow(); rerender();
+};
+A.bsDel = async () => {
+  if (!await confirmDlg(t('confirmDelete'))) return;
+  const id = CUR_ROUTE.arg;
+  S.brawl = S.brawl.filter(x => x.id !== id); save('brawl');
+  if (VS) { delete VS.data.brawl[id]; await saveVaultNow(); }
+  back();
+};
+
+/* ============================== SETTINGS ============================== */
+V.settings = {
+  title: () => t('m_settings'),
+  html() {
+    const s = S.settings;
+    const seg = (key, opts) => `<div class="seg">${opts.map(([v, l]) => `<button class="${String(s[key]) === String(v) ? 'on' : ''}" data-act="setOpt" data-k="${key}" data-v="${v}">${esc(l)}</button>`).join('')}</div>`;
+    const card = (icon, title, inner) => `<div class="card"><h3>${ic(icon, 17)}${title}</h3>${inner}</div>`;
+    const notifState = !('Notification' in window) ? t('notifNA') : Notification.permission === 'granted' ? t('notifOn') : t('notifOff');
+    const body =
+      card('globe', t('language'), seg('lang', [['de', 'Deutsch'], ['en', 'English']])) +
+      card('contrast', t('theme'), seg('theme', [['system', t('th_system')], ['light', t('th_light')], ['dark', t('th_dark')]])) +
+      card('timer', t('autolock'), seg('autolock', [[0, t('al_0')], [30, '30 s'], [60, '1 min'], [300, '5 min']]) + `<p class="hint" style="margin-bottom:0">${t('autolockHint')}</p>`) +
+      card('shield', t('security'), `<button class="btn block" style="margin-top:0" data-act="setChangePin">${ic('key', 16)}${t('changePin')}</button>`) +
+      card('bell', t('notifications'), `<p class="hint" style="margin-top:0">${notifState}</p>${'Notification' in window && Notification.permission !== 'granted' ? `<button class="btn block" data-act="askNotif">${t('allow')}</button>` : ''}`) +
+      card('database', t('storage'), `<p class="hint" id="persist-status" style="margin-top:0"></p><button class="btn block" data-act="setExport">${ic('download', 16)}${t('exportBackup')}</button><button class="btn block" data-act="setImport">${ic('upload', 16)}${t('importBackup')}</button><input type="file" id="imp-file" accept="application/json,.json" hidden data-change="setImportFile"><p class="hint" style="margin-bottom:0">${t('backupHint')}</p>`) +
+      card('alert', t('dangerZone'), `<button class="btn block danger-o" style="margin-top:0" data-act="setDeleteAll">${ic('trash', 16)}${t('deleteAll')}</button>`) +
+      `<p class="hint" style="text-align:center">PocketHub ${APP_VERSION} · ${t('aboutText')}</p>`;
+    return page(t('m_settings'), body);
+  },
+  async mount() {
+    let p = false; try { p = navigator.storage && navigator.storage.persisted && await navigator.storage.persisted(); } catch { }
+    const el = $('#persist-status'); if (el) el.textContent = p ? t('persistOn') : t('persistOff');
+  }
+};
+A.setOpt = el => {
+  const k = el.dataset.k; S.settings[k] = k === 'autolock' ? Number(el.dataset.v) : el.dataset.v;
+  save('settings'); applyTheme(); curNames = null; rerender();
+};
+A.setChangePin = async () => {
+  let raw = null;
+  const ok = await pinPad({ title: t('currentPin'), subtitle: t('enterPinSub'), onSubmit: async pin => { const r = await checkPin(pin); if (r.err) return r.err; raw = r.raw; return true; } });
+  if (!ok) return;
+  const pin = await choosePin(true);
+  if (!pin) return;
+  S.crypto = await wrapWithPin(pin, raw); await DB.set('crypto', S.crypto);
+  toast(t('pinChanged'));
+};
+A.setExport = async () => {
+  await flushSaves();
+  const data = await DB.getAll();
+  const blob = new Blob([JSON.stringify({ app: 'PocketHub', v: 1, exported: new Date().toISOString(), data })], { type: 'application/json' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `pockethub-backup-${today()}.json`;
+  document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
+  toast(t('exported'));
+};
+A.setImport = () => $('#imp-file').click();
+A.setImportFile = async el => {
+  const f = el.files[0]; el.value = ''; if (!f) return;
+  let obj; try { obj = JSON.parse(await f.text()); } catch { return toast(t('importBad')); }
+  if (!obj || obj.app !== 'PocketHub' || !obj.data || !obj.data.crypto || !obj.data.vault) return toast(t('importBad'));
+  if (!await confirmDlg(t('importConfirm'), t('import'), true)) return;
+  await DB.clear();
+  for (const [k, v] of Object.entries(obj.data)) await DB.set(k, v);
+  location.replace(location.pathname);
+};
+A.setDeleteAll = async () => {
+  const ok = await pinPad({ title: t('enterPin'), subtitle: t('deleteAll'), onSubmit: async pin => { const r = await checkPin(pin); return r.err || true; } });
+  if (!ok || !await confirmDlg(t('deleteAllConfirm'), t('deleteAll'))) return;
+  await DB.clear(); location.replace(location.pathname);
+};
+
+/* ============================ LOCK & SETUP ============================ */
+function applyTheme() {
+  document.documentElement.dataset.theme = S.settings.theme;
+  document.documentElement.lang = L();
+  requestAnimationFrame(() => { const m = $('meta[name=theme-color]'); if (m) m.content = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() || '#0b0d12'; });
+}
+async function choosePin(cancelable) {
+  for (; ;) {
+    let first = null;
+    const a = await pinPad({ title: cancelable ? t('newPin') : t('createPin'), subtitle: t('createPinSub'), fullscreen: !cancelable, cancelable, icon: 'shield', onSubmit: async p => { first = p; return true; } });
+    if (!a) return null;
+    let matched = false;
+    const b = await pinPad({ title: t('confirmPin'), subtitle: t('confirmPinSub'), fullscreen: !cancelable, cancelable: true, icon: 'shield', onSubmit: async p => { if (p === first) { matched = true; return true; } return t('pinMismatch'); } });
+    if (b && matched) return first;
+    if (cancelable && !b) return null;
+  }
+}
+function chooseLanguage() {
+  return new Promise(resolve => {
+    const el = document.createElement('div'); el.className = 'pin-overlay full';
+    el.innerHTML = `<div class="pin-box"><div class="pin-logo">${ic('logo', 26)}</div><div class="pin-title">PocketHub</div><div class="pin-sub">Sprache wählen · Choose language</div>
+      <div class="lang-pick"><button class="btn" data-l="de"><span class="code">DE</span>Deutsch${ic('chevRight', 18)}</button><button class="btn" data-l="en"><span class="code">EN</span>English${ic('chevRight', 18)}</button></div></div>`;
+    document.body.appendChild(el);
+    el.addEventListener('click', e => { const b = e.target.closest('[data-l]'); if (!b) return; el.remove(); resolve(b.dataset.l); });
+  });
+}
+async function setupFlow() {
+  S.settings.lang = await chooseLanguage();
+  applyTheme();
+  const pin = await choosePin(false);
+  await setupPin(pin);
+  await DB.set('settings', S.settings);
+}
+const unlockPad = () => pinPad({
+  title: t('enterPin'), subtitle: t('enterPinSub'), fullscreen: true, cancelable: false,
+  extra: `<button class="link" data-extra="forgot">${t('forgotPin')}</button>`, onExtra: forgotFlow,
+  onSubmit: async pin => { const r = await checkPin(pin); return r.err || true; }
+});
+async function lockScreen() {
+  if (LOCKED || !S.crypto) return;
+  await flushSaves();
+  if (CUR_VIEW && CUR_VIEW.vault) { history.replaceState(null, '', '#/'); await render(); }
+  dismissAllModals();
+  VS = null; LOCKED = true;
+  await unlockPad();
+  LOCKED = false;
+  rerender();
+  checkReminders();
+}
+async function forgotFlow() {
+  const a = await openModal({ title: t('forgotPin'), cls: 'top', body: `<p style="margin:0;color:var(--muted)">${esc(t('forgotText'))}</p>`, buttons: [{ label: t('cancel'), value: false, cls: 'ghost' }, { label: t('resetApp'), value: true, cls: 'danger' }] });
+  if (!a) return;
+  if (!await confirmDlg(t('resetConfirm2'), t('resetApp'), true, 'top')) return;
+  await DB.clear(); location.replace(location.pathname);
+}
+let hiddenAt = 0;
+document.addEventListener('visibilitychange', () => {
+  if (!S.crypto) return;
+  if (document.hidden) {
+    flushSaves(); hiddenAt = Date.now();
+    if (S.settings.autolock === 0) lockScreen();
+  } else {
+    if (!LOCKED && hiddenAt && Date.now() - hiddenAt >= S.settings.autolock * 1000) lockScreen();
+    hiddenAt = 0;
+    if (!LOCKED) checkReminders();
+  }
+});
+window.addEventListener('pagehide', () => { flushSaves(); });
+
+/* ================================ BOOT ================================ */
+async function boot() {
+  try { await DB.open(); }
+  catch (e) { document.body.innerHTML = '<p style="padding:20px">Storage not available (IndexedDB). Please use Chrome.</p>'; return; }
+  const all = await DB.getAll();
+  const def = DEFAULTS();
+  S = Object.assign(def, all);
+  S.settings = Object.assign(def.settings, all.settings || {});
+  S.settings.cur = Object.assign({ amt: '100', code: 'USD', dir: 'from' }, S.settings.cur || {});
+  S.money = Object.assign({ start: 0, entries: [] }, S.money || {});
+  S.lockout = Object.assign({ fails: 0, until: 0 }, S.lockout || {});
+  applyTheme();
+  if ('serviceWorker' in navigator && location.protocol !== 'file:') navigator.serviceWorker.register('sw.js').catch(e => console.warn('SW', e));
+  try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch { }
+  if (!S.crypto) await setupFlow();
+  else { LOCKED = true; await unlockPad(); LOCKED = false; }
+  if (V[parseHash().name] && V[parseHash().name].vault) history.replaceState(null, '', '#/');
+  await render();
+  setInterval(tickTimer, 500);
+  setInterval(checkReminders, 10000);
+  checkReminders();
+}
+boot();
+</script>
+</body>
+</html>
